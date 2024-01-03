@@ -9,11 +9,19 @@
         ],
         "module": "ESNext",
         "skipLibCheck": true,
+        "types": [
+            "node"
+        ],
         "plugins": [
             {
                 "name": "typescript-plugin-css-modules"
             }
         ],
+        "paths": {
+            "@/*": [
+                "./src/*"
+            ]
+        },
         /* Bundler mode */
         "moduleResolution": "bundler",
         "allowImportingTsExtensions": true,
