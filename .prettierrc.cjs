@@ -5,5 +5,5 @@ module.exports = {
     singleQuote: true,
     printWidth: 120,
     tailwindConfig: './tailwind.config.cjs',
-    plugins: [require('prettier-plugin-tailwindcss')]
+    plugins: ['prettier-plugin-tailwindcss']
 }
