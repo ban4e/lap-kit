@@ -6,6 +6,7 @@ module.exports = {
         'plugin:@typescript-eslint/recommended',
         'plugin:react/recommended',
         'plugin:react-hooks/recommended',
+        'plugin:storybook/recommended',
         // This disables the formatting rules in ESLint that Prettier is going to be responsible for handling.
         // Make sure it's always the last config, so it gets the chance to override other configs.
         'plugin:prettier/recommended'
@@ -106,9 +107,10 @@ module.exports = {
                 }
             }
         ],
+        'import/prefer-default-export': 0,
 
         // Prettier
-        // 'prettier/prettier': [4, { trailingComma: 'none', printWidth: 120 }],
+        // 'prettier/prettier': [2, { trailingComma: 'none', printWidth: 120 }],
 
         // React
         'react/react-in-jsx-scope': 0,

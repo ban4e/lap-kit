@@ -20,6 +20,9 @@
         "paths": {
             "@/*": [
                 "./src/*"
+            ],
+            "@assets/*": [
+                "./src/app/assets/*"
             ]
         },
         /* Bundler mode */
@@ -41,7 +44,8 @@
         "vite.config.ts",
         ".prettierrc.cjs",
         "tailwind.config.cjs",
-        "postcss.config.cjs"
+        "postcss.config.cjs",
+        ".storybook/main.ts"
     ],
     "references": [
         {

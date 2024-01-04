@@ -7,8 +7,21 @@ import svgr from 'vite-plugin-svgr';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-    plugins: [react(), svgr(), dynamicImport()],
-    resolve: { alias: [{ find: '@', replacement: path.resolve(__dirname, 'src') }] },
+    plugins: [
+        react(),
+        svgr({
+            // see details https://github.com/pd4d10/vite-plugin-svgr/issues/90#issuecomment-1781264477
+            include: '**/*.svg',
+            exclude: ''
+        }),
+        dynamicImport()
+    ],
+    resolve: {
+        alias: [
+            { find: '@', replacement: path.resolve(__dirname, 'src') },
+            { find: '@assets', replacement: path.resolve(__dirname, 'src/app/assets') }
+        ]
+    },
     css: {
         devSourcemap: true,
         modules: {
