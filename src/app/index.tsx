@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { Button } from '@/shared/ui/Button';
 import { Icon } from '@/shared/ui/Icon';
 
 const App = () => {
@@ -11,6 +12,10 @@ const App = () => {
                 Vite + React <Icon name="check" />{' '}
             </h1>
             <div className="mt-4 flex flex-col items-center">
+                <Button href="/" tag="a">
+                    Link
+                </Button>
+                <Button>Button</Button>
                 <button onClick={() => setCount((cnt) => cnt + 1)}>count is {count}</button>
             </div>
         </div>

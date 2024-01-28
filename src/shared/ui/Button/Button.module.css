@@ -1,0 +1,33 @@
+.button {
+    @apply relative inline-flex h-10 cursor-pointer items-center justify-center overflow-hidden rounded-lg border-none px-2 font-medium outline-none transition after:absolute after:-inset-px after:block after:rounded-inherit after:border-4 after:border-blue-400 after:opacity-0 after:transition-none focus-visible:after:opacity-100 focus-visible:after:transition active:after:opacity-0;
+    &__content {
+        @apply relative flex items-center;
+    }
+}
+
+.button_theme_primary {
+    @apply bg-blue-600 text-white hover:shadow-lg;
+}
+.button_theme_secondary {
+    @apply border-2 bg-gray-200 text-gray-900 hover:shadow-md dark:border-gray-500 dark:bg-gray-700 dark:text-white;
+}
+
+.button-pulse {
+    @apply pointer-events-none absolute inset-0 overflow-hidden rounded-inherit;
+    &__effect {
+        @apply absolute origin-center rounded-full bg-white bg-opacity-40 will-change-transform after:block after:pt-[100%] after:content-[''];
+    }
+}
+.button-pulse-enter {
+    .button-pulse__effect {
+        @apply scale-[.25] opacity-100;
+    }
+}
+.button-pulse-enter-active {
+    .button-pulse__effect {
+        @apply scale-[2] opacity-0;
+        transition:
+            opacity 0.6s,
+            transform 0.6s;
+    }
+}

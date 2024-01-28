@@ -13,8 +13,7 @@ export default function useDynamicSvgImport(iconName: string) {
             // Please make sure all your svg icons are placed in the same directory
             // If we want that part to be configurable then instead of iconName we will send iconPath as prop
             try {
-                // NOTE: Template string causes error in IntelliJ IDEA IDE
-                // eslint-disable-next-line prefer-template
+                // NOTE: Template string causes error in IntelliJ IDEA IßDE
                 importedIconRef.current = (await import(`@assets/icons/${iconName}.svg`)).default; // SVGR provides ReactComponent for given svg path
                 const componentData = importedIconRef.current?.({});
                 const width = (componentData as ReactElement)?.props?.width;
