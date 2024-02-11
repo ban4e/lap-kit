@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import cn from 'classnames';
 import React, { useRef } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
@@ -11,11 +11,18 @@ import styles from './Button.module.css';
 export const THEMES = {
     PRIMARY: 'primary',
     SECONDARY: 'secondary',
+    THIRD: 'third',
     SUCCESS: 'success',
     DANGER: 'danger'
 } as const;
-
 type ButtonTheme = ValueOf<typeof THEMES>;
+
+export const FILLS = {
+    SOLID: 'solid',
+    OUTLINE: 'outline',
+    TEXT: 'text'
+} as const;
+type ButtonFill = ValueOf<typeof FILLS>;
 
 interface IBaseProps {
     children: React.ReactNode;
@@ -23,6 +30,7 @@ interface IBaseProps {
     isLoading?: boolean;
     disabled?: boolean;
     theme?: ButtonTheme;
+    fill?: ButtonFill;
     onClick?: (e: React.MouseEvent) => void;
 }
 
@@ -68,10 +76,14 @@ const Button: IButtonOverload = (props: IButtonProps | IAnchorProps) => {
     };
 
     /* Classes */
-    const themeClass = styles[`button_theme_${props.theme || THEMES.PRIMARY}`];
-    const rootClass = classNames(styles.button, themeClass, {
+    const btnFill = props.fill || FILLS.SOLID;
+    const btnTheme = props.theme || THEMES.PRIMARY;
+
+    const themeClass = styles[`button_theme_${btnTheme}`];
+    const fillClass = styles[`button_${btnFill}`];
+    const rootClass = cn(styles.button, themeClass, fillClass, {
         'is-loading': props.isLoading,
-        'is-disabled': props.disabled
+        [styles['is-disabled']]: props.disabled
     });
     const content = (
         <>
@@ -113,7 +125,7 @@ const Button: IButtonOverload = (props: IButtonProps | IAnchorProps) => {
     );
 
     if (isAnchor(props)) {
-        const { className, children, theme, isLoading, ...attrs } = props; // NOTE: typings works correctly only if destuction are made inside branch
+        const { className, children, theme, fill, isLoading, ...attrs } = props; // NOTE: typings works correctly only if destuction are made inside branch
 
         return (
             <a
@@ -121,7 +133,7 @@ const Button: IButtonOverload = (props: IButtonProps | IAnchorProps) => {
                     buttonRef.current = node;
                 }}
                 {...attrs}
-                className={classNames(rootClass, className)}
+                className={cn(rootClass, className)}
                 role="button"
                 tabIndex={0}
                 onClick={handleClick}
@@ -133,7 +145,7 @@ const Button: IButtonOverload = (props: IButtonProps | IAnchorProps) => {
     }
 
     // button render
-    const { className, children, theme, isLoading, ...attrs } = props;
+    const { className, children, theme, fill, isLoading, ...attrs } = props;
 
     return (
         <button
@@ -141,7 +153,7 @@ const Button: IButtonOverload = (props: IButtonProps | IAnchorProps) => {
                 buttonRef.current = node;
             }}
             {...attrs}
-            className={classNames(rootClass, className)}
+            className={cn(rootClass, className)}
             onClick={handleClick}
         >
             {content}
