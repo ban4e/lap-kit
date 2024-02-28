@@ -9,7 +9,10 @@
         ],
         "module": "ESNext",
         "skipLibCheck": true,
+        "esModuleInterop": true,
         "types": [
+            "jest",
+            "@testing-library/jest-dom",
             "node"
         ],
         "plugins": [
@@ -45,6 +48,7 @@
         ".prettierrc.cjs",
         "tailwind.config.cjs",
         "postcss.config.cjs",
+        "jest.config.cjs", // "src" is also include setupTests.ts file
         ".storybook/main.ts",
         ".storybook/main.ts",
         ".storybook/preview.tsx",
