@@ -8,11 +8,11 @@ enum InputMasks {
     'numeric' = 'numeric'
 }
 
-export interface IInputAtomic extends React.ComponentPropsWithRef<'input'> {
+interface InputAtomicProps extends React.ComponentPropsWithRef<'input'> {
     mask?: keyof typeof InputMasks;
 }
 
-const InputAtomic = forwardRef<HTMLInputElement, IInputAtomic>(function InputAtomic(
+const InputAtomic = forwardRef<HTMLInputElement, InputAtomicProps>(function InputAtomic(
     { mask, type = 'text', className = '', ...props },
     ref
 ) {

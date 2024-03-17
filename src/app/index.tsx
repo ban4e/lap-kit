@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { Button } from '@/shared/ui/Button';
 import { Icon } from '@/shared/ui/Icon';
-import { InputAtomic } from '@/shared/ui/Input';
+import { Input } from '@/shared/ui/Input';
 
 const App = () => {
     const [count, setCount] = useState(0);
@@ -12,8 +12,10 @@ const App = () => {
             <h1>
                 Vite + React <Icon name="check" />{' '}
             </h1>
-            <div className="mt-4 flex flex-col items-center">
-                <InputAtomic mask="numeric" />
+            <div className="mt-4 flex flex-col items-stretch gap-4">
+                <Input error="Error text" label="Your label here" />
+                <Input error="Error text" label="Your label here" view="filled" />
+                <Input label="Your title here" view="clear" />
                 <Button href="/" tag="a">
                     Link
                 </Button>
