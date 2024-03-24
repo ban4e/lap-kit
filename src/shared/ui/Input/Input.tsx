@@ -38,6 +38,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function InputField(
             <InputAtomic
                 {...props}
                 ref={ref}
+                disabled={disabled}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 onFocus={() => setFocused(true)}

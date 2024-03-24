@@ -47,10 +47,10 @@ const FieldContainer = ({
             })}
         >
             <div className={classNames(styles.field__container)}>
-                {view === FieldView.OUTLINED && label && (
+                {view === FieldView.OUTLINED && (
                     <fieldset className={styles.field__fieldset}>
                         <legend className={styles.field__legend}>
-                            <span className={styles['field__legend-text']}>{label}</span>
+                            {label && <span className={styles['field__legend-text']}>{label}</span>}
                         </legend>
                     </fieldset>
                 )}
