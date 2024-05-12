@@ -10,7 +10,7 @@ interface InputAtomicProps extends React.ComponentPropsWithRef<typeof InputAtomi
 interface InputProps extends Omit<FieldContainerProps, 'children'>, Omit<InputAtomicProps, keyof FieldContainerProps> {}
 
 const Input = forwardRef<HTMLInputElement, InputProps>(function InputField(
-    { view, className, label, error, disabled, ...props },
+    { view, className, label, error, disabled, suffix, prefix, ...props },
     ref
 ) {
     const [focused, setFocused] = useState(false);
@@ -33,6 +33,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function InputField(
             isFilled={filled}
             isFocused={focused}
             label={label}
+            prefix={prefix}
+            suffix={suffix}
             view={view}
         >
             <InputAtomic

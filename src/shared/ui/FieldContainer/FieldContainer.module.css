@@ -8,7 +8,7 @@
         @apply relative flex items-center;
     }
     &__label {
-        @apply text-n-4 pointer-events-none absolute left-3 top-1/2 max-w-[calc(100%-theme(space.6))] origin-top-left -translate-y-1/2 transform truncate leading-tight transition;
+        @apply pointer-events-none absolute left-3 top-1/2 max-w-[calc(100%-theme(space.6))] origin-top-left -translate-y-1/2 transform truncate leading-tight text-n-4 transition dark:text-n-5;
         transition-property: color, transform, max-width;
         transition-delay: 0s, 0s, 0.01s;
     }
@@ -32,9 +32,31 @@
             -moz-appearance: textfield;
         }
     }
+    &__side {
+        @apply absolute text-n-5 dark:text-n-5;
+        &_prefix {
+            @apply left-3;
+            & ~ input {
+                @apply pl-12;
+            }
+        }
+        &_suffix {
+            @apply right-3;
+            & ~ input {
+                @apply pr-12;
+            }
+            & ~ .field__label {
+                @apply pr-9;
+            }
+        }
+    }
     &__error {
         @apply absolute left-1 top-full text-[11px] leading-tight text-danger;
     }
+}
+
+.field-side {
+    @apply flex max-h-12 w-6 items-center truncate;
 }
 
 /* COMMON STATES */
@@ -52,10 +74,16 @@
 /* VIEW FILLED */
 .field_filled {
     .field__container {
-        @apply bg-n-1 rounded-lg before:absolute before:inset-0 before:block before:rounded-inherit before:border before:border-transparent before:transition;
+        @apply rounded-lg bg-n-1 before:absolute before:inset-0 before:block before:rounded-inherit before:border before:border-transparent before:transition dark:bg-n-8;
     }
     input {
         @apply pb-1 pt-3.5;
+    }
+    .field__side {
+        @apply max-h-6;
+        &_prefix {
+            @apply translate-y-1;
+        }
     }
 }
 .field_filled.is-filled,
@@ -78,6 +106,9 @@
     .field__label {
         @apply text-n-3;
     }
+    .field__side {
+        @apply text-n-3/90;
+    }
     input {
         @apply text-n-3;
     }
@@ -86,7 +117,7 @@
 /* VIEW OUTLINED */
 .field_outlined {
     .field__fieldset {
-        @apply field-spacing-x border-n-3 absolute inset-0 min-w-0 rounded-lg border transition;
+        @apply field-spacing-x absolute inset-0 min-w-0 rounded-lg border border-n-3 transition dark:border-n-6;
         transition-property: border;
     }
     .field__legend {
@@ -123,6 +154,9 @@
     .field__label {
         @apply text-n-3;
     }
+    .field__side {
+        @apply text-n-3/90;
+    }
     input {
         @apply text-n-3;
     }
@@ -136,6 +170,23 @@
     input {
         @apply px-0 pb-1 pt-3.5;
     }
+    .field__side {
+        &_prefix {
+            @apply left-0 translate-y-1;
+            & ~ input {
+                @apply !pl-8;
+            }
+        }
+        &_suffix {
+            @apply right-0;
+            & ~ input {
+                @apply !pr-8;
+            }
+            & ~ .field__label {
+                @apply !pr-4;
+            }
+        }
+    }
 }
 .field_clear.is-filled,
 .field_clear.is-focused {
@@ -146,6 +197,9 @@
 .field_clear.is-disabled {
     .field__label {
         @apply text-n-3;
+    }
+    .field__side {
+        @apply text-n-3/90;
     }
     input {
         @apply text-n-3;

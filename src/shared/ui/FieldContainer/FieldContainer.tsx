@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import cn from 'classnames';
 
 import { ValueOf } from '@/shared/lib/types';
 
@@ -17,8 +17,10 @@ export interface IFieldContainerProps {
     error?: string;
     isFocused?: boolean;
     isFilled?: boolean;
-    className?: classNames.Argument;
+    className?: cn.Argument;
     children: React.ReactNode;
+    suffix?: React.ReactNode;
+    prefix?: React.ReactNode;
     containerRef?: React.Ref<HTMLDivElement> | null;
 }
 
@@ -31,14 +33,16 @@ const FieldContainer = ({
     isFilled,
     className,
     children,
+    suffix,
+    prefix,
     containerRef
 }: IFieldContainerProps) => {
     return (
         <div
             ref={containerRef}
-            className={classNames(styles.field, className, {
+            className={cn(styles.field, className, {
                 [styles['is-focused']]: isFocused,
-                [styles['is-filled']]: isFilled,
+                [styles['is-filled']]: isFilled || prefix,
                 [styles['is-error']]: !!error,
                 [styles['is-disabled']]: disabled,
                 [styles.field_filled]: view === FieldView.FILLED,
@@ -46,13 +50,23 @@ const FieldContainer = ({
                 [styles.field_clear]: view === FieldView.CLEAR
             })}
         >
-            <div className={classNames(styles.field__container)}>
+            <div className={cn(styles.field__container)}>
                 {view === FieldView.OUTLINED && (
                     <fieldset className={styles.field__fieldset}>
                         <legend className={styles.field__legend}>
                             {label && <span className={styles['field__legend-text']}>{label}</span>}
                         </legend>
                     </fieldset>
+                )}
+                {prefix && (
+                    <span className={cn(styles['field-side'], styles.field__side, styles.field__side_prefix)}>
+                        {prefix}
+                    </span>
+                )}
+                {suffix && (
+                    <span className={cn(styles['field-side'], styles.field__side, styles.field__side_suffix)}>
+                        {suffix}
+                    </span>
                 )}
                 {children}
                 {label && <span className={styles.field__label}>{label}</span>}

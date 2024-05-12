@@ -1,3 +1,5 @@
+import { Icon } from '@/shared/ui/Icon';
+
 import Input from './Input';
 
 import type { Meta, StoryObj } from '@storybook/react';
@@ -5,6 +7,13 @@ import type { Meta, StoryObj } from '@storybook/react';
 // In a CSF file, this is the default export
 const meta = { component: Input } satisfies Meta<typeof Input>;
 export default meta;
+
+const CheckIcon = <Icon className="fill-success" name="check" />;
+const UserIcon = <Icon className="fill-current" name="user" />;
+const icons = {
+    CheckIcon,
+    UserIcon
+};
 
 export const Overview: StoryObj<typeof Input> = {
     argTypes: {
@@ -20,18 +29,34 @@ export const Overview: StoryObj<typeof Input> = {
         mask: {
             control: 'select'
         },
+        prefix: {
+            control: 'text'
+        },
+        suffix: {
+            options: Object.keys(icons),
+            mapping: icons,
+            control: {
+                type: 'select',
+                labels: {
+                    CheckIcon: 'check',
+                    UserIcon: 'user'
+                }
+            }
+        },
         view: {
             control: 'select'
         }
     },
     args: {
+        suffix: 'UserIcon',
+        prefix: '',
         disabled: false,
         error: '',
         label: 'Very long overflowed label text',
         view: 'outlined'
     },
     parameters: {
-        controls: { include: ['disabled', 'error', 'label', 'mask', 'view'] }
+        controls: { include: ['suffix', 'prefix', 'disabled', 'error', 'label', 'mask', 'view'] }
     },
     render: (args) => (
         <div className="w-[240px]">
