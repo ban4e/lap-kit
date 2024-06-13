@@ -3,6 +3,13 @@ import { useState } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { Icon } from '@/shared/ui/Icon';
 import { Input } from '@/shared/ui/Input';
+import { Select } from '@/shared/ui/Select';
+
+const options = [
+    { value: 'chocolate', label: 'Chocolate' },
+    { value: 'strawberry', label: 'Strawberry' },
+    { value: 'vanilla', label: 'Vanilla' }
+];
 
 const App = () => {
     const [count, setCount] = useState(0);
@@ -14,8 +21,9 @@ const App = () => {
             </h1>
             <div className="mt-4 flex flex-col items-stretch gap-4">
                 <Input error="Error text" label="Your label here" />
-                <Input error="Error text" label="Your label here" view="filled" />
+                <Input label="Your label here" view="filled" />
                 <Input label="Your title here" view="clear" />
+                <Select isClearable options={options} />
                 <Button href="/" tag="a">
                     Link
                 </Button>
