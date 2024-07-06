@@ -9,7 +9,7 @@ module.exports = {
         'plugin:storybook/recommended',
         // This disables the formatting rules in ESLint that Prettier is going to be responsible for handling.
         // Make sure it's always the last config, so it gets the chance to override other configs.
-        'plugin:prettier/recommended'
+        'prettier'
     ],
     parser: '@typescript-eslint/parser',
     parserOptions: {
@@ -45,6 +45,7 @@ module.exports = {
         'no-restricted-syntax': 0,
         'no-nested-ternary': 0,
         'max-classes-per-file': 0,
+        'prefer-arrow-callback': [2, { allowNamedFunctions: true }],
         'jsx-a11y/label-has-associated-control': [
             2,
             {
@@ -110,7 +111,7 @@ module.exports = {
         'import/prefer-default-export': 0,
 
         // Prettier
-        // 'prettier/prettier': [2, { trailingComma: 'none', printWidth: 120 }],
+        'prettier/prettier': [2, { trailingComma: 'none', printWidth: 120 }],
 
         // React
         'react/react-in-jsx-scope': 0,

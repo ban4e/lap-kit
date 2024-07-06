@@ -36,27 +36,23 @@ export const Overview: StoryObj<typeof Button> = {
 export const Examples: StoryObj<typeof Button> = {
     render: () => (
         <div className="grid auto-cols-max grid-flow-row gap-4 text-foreground">
-            {Object.values(THEMES).map((theme) => {
-                return (
-                    <div key={theme}>
-                        <h3 className="mb-2 capitalize">{theme}</h3>
-                        <div className="grid grid-flow-col auto-rows-max gap-2">
-                            {Object.values(FILLS).map((fill) => {
-                                return (
-                                    <React.Fragment key={fill}>
-                                        <Button fill={fill} theme={theme}>
-                                            Button <Icon className="ml-1 fill-current" name="check" width={14} />
-                                        </Button>
-                                        <Button disabled fill={fill} theme={theme}>
-                                            Button <Icon className="ml-1 fill-current" name="check" width={14} />
-                                        </Button>
-                                    </React.Fragment>
-                                );
-                            })}
-                        </div>
+            {Object.values(THEMES).map((theme) => (
+                <div key={theme}>
+                    <h3 className="mb-2 capitalize">{theme}</h3>
+                    <div className="grid grid-flow-col auto-rows-max gap-2">
+                        {Object.values(FILLS).map((fill) => (
+                            <React.Fragment key={fill}>
+                                <Button fill={fill} theme={theme}>
+                                    Button <Icon className="ml-1 fill-current" name="check" width={14} />
+                                </Button>
+                                <Button disabled fill={fill} theme={theme}>
+                                    Button <Icon className="ml-1 fill-current" name="check" width={14} />
+                                </Button>
+                            </React.Fragment>
+                        ))}
                     </div>
-                );
-            })}
+                </div>
+            ))}
         </div>
     )
 };

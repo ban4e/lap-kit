@@ -5,7 +5,7 @@
 .field {
     @apply relative;
     &__container {
-        @apply relative flex items-center;
+        @apply field-spacing-x relative flex h-12 cursor-text items-center;
     }
     &__label {
         @apply pointer-events-none absolute left-3 top-1/2 max-w-[calc(100%-theme(space.6))] origin-top-left -translate-y-1/2 transform truncate leading-tight text-n-4 transition dark:text-n-5;
@@ -13,7 +13,7 @@
         transition-delay: 0s, 0s, 0.01s;
     }
     input {
-        @apply field-spacing-x relative block h-12 w-full resize-none rounded-inherit border-none bg-transparent leading-tight text-foreground outline-none transition dark:text-white;
+        @apply relative block h-full w-full resize-none rounded-inherit border-none bg-transparent leading-tight text-foreground outline-none transition dark:text-white;
         &:-webkit-autofill,
         &-internal-autofill-selected {
             background-color: transparent !important;
@@ -33,30 +33,17 @@
         }
     }
     &__side {
-        @apply absolute text-n-5 dark:text-n-5;
+        @apply relative flex max-h-full flex-shrink-0 cursor-default items-center leading-tight text-n-5 dark:text-n-5;
         &_prefix {
-            @apply left-3;
-            & ~ input {
-                @apply pl-12;
-            }
+            @apply mr-1;
         }
         &_suffix {
-            @apply right-3;
-            & ~ input {
-                @apply pr-12;
-            }
-            & ~ .field__label {
-                @apply pr-9;
-            }
+            @apply ml-1;
         }
     }
     &__error {
         @apply absolute left-1 top-full text-[11px] leading-tight text-danger;
     }
-}
-
-.field-side {
-    @apply flex max-h-12 w-6 items-center truncate;
 }
 
 /* COMMON STATES */
@@ -78,12 +65,6 @@
     }
     input {
         @apply pb-1 pt-3.5;
-    }
-    .field__side {
-        @apply max-h-6;
-        &_prefix {
-            @apply translate-y-1;
-        }
     }
 }
 .field_filled.is-filled,
@@ -164,28 +145,14 @@
 
 /* VIEW CLEAR */
 .field_clear {
+    .field__container {
+        @apply px-0;
+    }
     .field__label {
         @apply left-0;
     }
     input {
-        @apply px-0 pb-1 pt-3.5;
-    }
-    .field__side {
-        &_prefix {
-            @apply left-0 translate-y-1;
-            & ~ input {
-                @apply !pl-8;
-            }
-        }
-        &_suffix {
-            @apply right-0;
-            & ~ input {
-                @apply !pr-8;
-            }
-            & ~ .field__label {
-                @apply !pr-4;
-            }
-        }
+        @apply pb-1 pt-3.5;
     }
 }
 .field_clear.is-filled,

@@ -3,7 +3,7 @@ import React, { useRef } from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import usePulse from '@/shared/lib/hooks/usePulse';
-import useRect from '@/shared/lib/hooks/userRect';
+import useRect from '@/shared/lib/hooks/useRect';
 import { ValueOf } from '@/shared/lib/types';
 
 import styles from './Button.module.css';
@@ -55,7 +55,7 @@ const Button: IButtonOverload = (props: IButtonProps | IAnchorProps) => {
     const withPulse: typeof props.withPulse = 'withPulse' in props ? props.withPulse : true;
 
     const buttonRef = useRef<HTMLButtonElement | HTMLAnchorElement | null>(null);
-    const buttonRect = useRect(buttonRef);
+    const [buttonRect] = useRect(buttonRef);
     const { pulseItems, pulseClick, handlePulseEnter, handlePulseEntered } = usePulse(buttonRect);
 
     const handleClick = (
@@ -92,33 +92,31 @@ const Button: IButtonOverload = (props: IButtonProps | IAnchorProps) => {
             <span className={styles.button__content}>{props.children}</span>
             {withPulse && (
                 <TransitionGroup component={null}>
-                    {pulseItems.map((pulseItem, i) => {
-                        return (
-                            <CSSTransition
-                                key={pulseItem.id}
-                                appear
-                                className={styles.buttonPulse}
-                                classNames={{
-                                    enter: styles.buttonPulseEnter,
-                                    enterActive: styles.buttonPulseEnterActive
-                                }}
-                                exit={false}
-                                nodeRef={pulseItem.nodeRef as React.RefObject<HTMLSpanElement>}
-                                timeout={700}
-                                unmountOnExit
-                                onEnter={() => {
-                                    handlePulseEnter(i);
-                                }}
-                                onEntered={() => {
-                                    handlePulseEntered(i);
-                                }}
-                            >
-                                <span ref={pulseItem.nodeRef as React.RefObject<HTMLSpanElement>}>
-                                    <span className={styles['button-pulse__effect']} style={pulseItem.style} />
-                                </span>
-                            </CSSTransition>
-                        );
-                    })}
+                    {pulseItems.map((pulseItem, i) => (
+                        <CSSTransition
+                            key={pulseItem.id}
+                            appear
+                            className={styles.buttonPulse}
+                            classNames={{
+                                enter: styles.buttonPulseEnter,
+                                enterActive: styles.buttonPulseEnterActive
+                            }}
+                            exit={false}
+                            nodeRef={pulseItem.nodeRef as React.RefObject<HTMLSpanElement>}
+                            timeout={700}
+                            unmountOnExit
+                            onEnter={() => {
+                                handlePulseEnter(i);
+                            }}
+                            onEntered={() => {
+                                handlePulseEntered(i);
+                            }}
+                        >
+                            <span ref={pulseItem.nodeRef as React.RefObject<HTMLSpanElement>}>
+                                <span className={styles['button-pulse__effect']} style={pulseItem.style} />
+                            </span>
+                        </CSSTransition>
+                    ))}
                 </TransitionGroup>
             )}
         </>

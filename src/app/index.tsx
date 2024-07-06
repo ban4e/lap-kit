@@ -20,10 +20,12 @@ const App = () => {
                 Vite + React <Icon name="check" />{' '}
             </h1>
             <div className="mt-4 flex flex-col items-stretch gap-4">
-                <Input error="Error text" label="Your label here" />
+                <Input error="Error text" label="Your label here" prefix="kg" suffix="mass" />
+                <Input label="Your label here" prefix="kg" suffix="mass" view="filled" />
                 <Input label="Your label here" view="filled" />
-                <Input label="Your title here" view="clear" />
-                <Select isClearable options={options} />
+                <Input label="Your title here" prefix="kg" view="clear" />
+                <Select isClearable label="Your label here" options={options} suffix="kg" />
+                <Select label="Your label here" options={options} suffix="kg" view="filled" />
                 <Button href="/" tag="a">
                     Link
                 </Button>

@@ -11,6 +11,7 @@
         "skipLibCheck": true,
         "esModuleInterop": true,
         "types": [
+            "vite/client",
             "jest",
             "@testing-library/jest-dom",
             "node"
@@ -43,13 +44,13 @@
     },
     "include": [
         "src",
+        "types",
         ".eslintrc.cjs",
         "vite.config.ts",
         ".prettierrc.cjs",
         "tailwind.config.cjs",
         "postcss.config.cjs",
         "jest.config.cjs", // "src" is also include setupTests.ts file
-        ".storybook/main.ts",
         ".storybook/main.ts",
         ".storybook/preview.tsx",
         "**/*.tsx"
