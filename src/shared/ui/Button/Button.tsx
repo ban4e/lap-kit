@@ -55,7 +55,7 @@ const Button: IButtonOverload = (props: IButtonProps | IAnchorProps) => {
     const withPulse: typeof props.withPulse = 'withPulse' in props ? props.withPulse : true;
 
     const buttonRef = useRef<HTMLButtonElement | HTMLAnchorElement | null>(null);
-    const [buttonRect] = useRect(buttonRef);
+    const buttonRect = useRect(buttonRef);
     const { pulseItems, pulseClick, handlePulseEnter, handlePulseEntered } = usePulse(buttonRect);
 
     const handleClick = (

@@ -1,6 +1,7 @@
 import cn from 'classnames';
-import { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
+import useRect from '@/shared/lib/hooks/useRect';
 import { ValueOf } from '@/shared/lib/types';
 
 import styles from './FieldContainer.module.css';
@@ -25,7 +26,7 @@ export interface IFieldContainerProps {
     rootRef?: React.Ref<HTMLDivElement> | null;
 }
 
-const VIEWS_WITH_CLOSE_LABEL: ValueOf<typeof FieldView>[] = [FieldView.OUTLINED, FieldView.FILLED];
+export const VIEWS_WITH_CLOSE_LABEL: ValueOf<typeof FieldView>[] = [FieldView.CLEAR, FieldView.FILLED];
 
 const FieldContainer = ({
     view = FieldView.OUTLINED,
@@ -41,6 +42,12 @@ const FieldContainer = ({
     rootRef
 }: IFieldContainerProps) => {
     const containerRef = useRef<HTMLDivElement | null>(null);
+    const [inputRef, setInputRef] = useState<{ current: HTMLDivElement | null }>({ current: null });
+    const setRef = useCallback((newNode: HTMLDivElement | null) => {
+        containerRef.current = newNode;
+        setInputRef({ current: newNode?.querySelector('input') || null });
+    }, []);
+    const inputRect = useRect(inputRef);
 
     const focusInput = () => {
         if (!disabled && containerRef && !isFocused) {
@@ -80,7 +87,7 @@ const FieldContainer = ({
                 [styles.field_clear]: view === FieldView.CLEAR
             })}
         >
-            <div ref={containerRef} aria-hidden="true" className={cn(styles.field__container)} onClick={focusInput}>
+            <div ref={setRef} aria-hidden="true" className={cn(styles.field__container)} onClick={focusInput}>
                 {view === FieldView.OUTLINED && (
                     <fieldset className={styles.field__fieldset}>
                         <legend className={styles.field__legend}>
@@ -117,7 +124,14 @@ const FieldContainer = ({
                         {suffix}
                     </span>
                 )}
-                {label && <span className={styles.field__label}>{label}</span>}
+                {label && (
+                    <span
+                        className={styles.field__label}
+                        style={{ width: isKeepFocus || isFilled || prefix ? 'auto' : `${inputRect.width}px` }}
+                    >
+                        {label}
+                    </span>
+                )}
             </div>
             {error && <div className={styles.field__error}>{error}</div>}
         </div>

@@ -1,7 +1,7 @@
 // source: https://gist.github.com/morajabi/523d7a642d8c0a2f71fcfa0d8b3d2846
-import React, { useLayoutEffect, useCallback, useState } from 'react';
+import { useLayoutEffect, useCallback, useState } from 'react';
 
-export function getRect<T extends HTMLElement>(element?: T): DOMRectReadOnly {
+function getRect<T extends HTMLElement>(element?: T): DOMRectReadOnly {
     let rect = {
         x: 0,
         y: 0,
@@ -21,8 +21,8 @@ export function getRect<T extends HTMLElement>(element?: T): DOMRectReadOnly {
     return rect;
 }
 
-export default function useRect<T extends HTMLElement>(ref: React.RefObject<T>): [DOMRectReadOnly, () => void] {
-    const [rect, setRect] = useState<DOMRectReadOnly>(ref && ref.current ? getRect(ref.current) : getRect());
+export default function useRect<T extends HTMLElement>(ref: React.RefObject<T>): DOMRectReadOnly {
+    const [rect, setRect] = useState<DOMRectReadOnly>(ref?.current ? getRect(ref.current) : getRect());
 
     const handleResize = useCallback(() => {
         if (!ref.current) {
@@ -56,5 +56,5 @@ export default function useRect<T extends HTMLElement>(ref: React.RefObject<T>):
         return () => window.removeEventListener('resize', handleResize);
     }, [ref, handleResize]);
 
-    return [rect, handleResize];
+    return rect;
 }

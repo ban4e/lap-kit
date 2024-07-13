@@ -4,7 +4,7 @@
         @apply static flex h-full flex-wrap items-center justify-between border-none outline-none;
     }
     &-value {
-        @apply absolute inset-0 flex flex-1 items-center overflow-hidden px-3;
+        @apply absolute inset-0 grid flex-1 items-center overflow-hidden px-3;
     }
     &-indicators-container {
         @apply relative ml-auto;
@@ -17,5 +17,8 @@
         &_selected {
             @apply bg-n-1 text-foreground;
         }
+    }
+    &-input-container {
+        grid-area: 1 / 1 / 2 / 3;
     }
 }

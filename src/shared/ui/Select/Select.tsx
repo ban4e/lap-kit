@@ -1,7 +1,6 @@
 // TODO: Imporve displaying multiple select
-// TODO: Clean up
 import cn from 'classnames';
-import React, { Ref, forwardRef, useCallback, useLayoutEffect, useRef, useState } from 'react';
+import React, { Ref, forwardRef, useCallback, useRef, useState } from 'react';
 import ReactSelect, {
     ActionMeta,
     ControlProps,
@@ -10,12 +9,13 @@ import ReactSelect, {
     Props as ReactSelectProps,
     SelectInstance,
     SingleValue,
+    ValueContainerProps,
     components
 } from 'react-select';
 
 import useCombinedRefs from '@/shared/lib/hooks/useCombinedRefs';
-import { getRect } from '@/shared/lib/hooks/useRect';
-import { FieldContainer } from '@/shared/ui/FieldContainer';
+import useRect from '@/shared/lib/hooks/useRect';
+import { FieldContainer, VIEWS_WITH_CLOSE_LABEL } from '@/shared/ui/FieldContainer';
 
 import styles from './Select.module.css';
 
@@ -37,6 +37,15 @@ const ControlComponent = (props: ControlProps<OptionType>) => (
         innerProps={{
             ...props.innerProps,
             'data-control': 'true' // NOTE: React.HTMLAttrubutes are extended with types/react.d.ts, cause data-* attrubutes does not supported by default
+        }}
+    />
+);
+const ValueContainerComponent = (props: ValueContainerProps<OptionType>) => (
+    <components.ValueContainer
+        {...props}
+        innerProps={{
+            ...props.innerProps,
+            'data-value-container': 'true' // NOTE: React.HTMLAttrubutes are extended with types/react.d.ts, cause data-* attrubutes does not supported by default
         }}
     />
 );
@@ -63,45 +72,27 @@ const Select = forwardRef<SelectInstance, SelectProps<OptionType>>(function Sele
     };
 
     // Calculate width for singleValue and inputs
-    const selectRef = useRef<SelectInstance | null>(null);
-    const selectCombinedRef = useCombinedRefs(ref, selectRef);
-    const [controlRect, setControlRect] = useState<DOMRectReadOnly>(getRect());
-    const [indicatorsRect, setIndicatorsRect] = useState<DOMRectReadOnly>(getRect());
-    const handleResize = useCallback(() => {
-        const controlRef = selectRef.current?.controlRef;
-        if (!controlRef) {
-            return;
-        }
-        const indicatorsEl: HTMLElement | null = controlRef.querySelector('[data-indicators]');
-        setControlRect(getRect(controlRef));
-        indicatorsEl && setIndicatorsRect(getRect(indicatorsEl));
+    const [, setSelectRef] = useState<{ current: SelectInstance | null }>({ current: null });
+    const controlRef = useRef<HTMLElement | null>(null);
+    const indicatorsRef = useRef<HTMLElement | null>(null);
+    const valueContainerRef = useRef<HTMLElement | null>(null);
+    const containerPaddingX = useRef<number>(0);
+    const updateSelectRef = useCallback((selectInst: SelectInstance | null) => {
+        setSelectRef({ current: selectInst || null });
+        controlRef.current = selectInst?.controlRef || null;
+        valueContainerRef.current = selectInst?.controlRef?.querySelector('[data-value-container]') || null;
+        indicatorsRef.current = selectInst?.controlRef?.querySelector('[data-indicators]') || null;
+        containerPaddingX.current = // TODO: padding changes are not supported (apply to hook same as useRect)
+            (valueContainerRef.current &&
+                parseFloat(getComputedStyle(valueContainerRef.current, null).getPropertyValue('padding-left'))) ||
+            0;
     }, []);
+    const selectCombinedRef = useCombinedRefs(ref, updateSelectRef);
+    const controlRect = useRect(controlRef); // TODO: do it in one hook
+    const indicatorsRect = useRect(indicatorsRef);
+    const valueContainerRect = useRect(valueContainerRef);
 
-    // TODO: custom hook useRect isn't working here, because of custom hooks fires before react hooks inside component. That's in custom hook selectRef.current is empty
-    useLayoutEffect(() => {
-        const element = selectRef.current?.controlRef;
-        if (!element) {
-            return;
-        }
-
-        handleResize();
-
-        if (typeof ResizeObserver === 'function') {
-            let resizeObserver: ResizeObserver | null = new ResizeObserver(() => handleResize());
-            resizeObserver.observe(element);
-
-            return () => {
-                if (!resizeObserver) {
-                    return;
-                }
-                resizeObserver.disconnect();
-                resizeObserver = null;
-            };
-        }
-        window.addEventListener('resize', handleResize); // Browser support, remove freely
-
-        return () => window.removeEventListener('resize', handleResize);
-    }, [handleResize]);
+    const prefixIndentPx = controlRect.x - valueContainerRect.x - containerPaddingX.current;
 
     return (
         <FieldContainer
@@ -120,16 +111,15 @@ const Select = forwardRef<SelectInstance, SelectProps<OptionType>>(function Sele
                 ref={selectCombinedRef as Ref<SelectInstance<OptionType>>}
                 classNames={{
                     container: () => styles.select,
-                    control: () =>
-                        cn(styles['select-control'], {
-                            'pb-1 pt-3.5': view === 'filled' // TODO: This is not ideal that select knows about view
-                        }),
+                    control: () => cn(styles['select-control']),
                     valueContainer: () =>
                         cn(styles['select-value'], {
-                            'pb-1 pt-3.5': view === 'filled' // TODO: This is not ideal that select knows about view
+                            '!px-0': view === 'clear',
+                            'pb-1 pt-3.5': view && VIEWS_WITH_CLOSE_LABEL.includes(view) // TODO: This is not ideal that select knows about view
                         }),
                     indicatorsContainer: () => styles['select-indicators-container'],
                     menu: () => styles['select-menu'],
+                    input: () => styles['select-input-container'],
                     option: (state) =>
                         cn([
                             styles['select-option'],
@@ -138,7 +128,11 @@ const Select = forwardRef<SelectInstance, SelectProps<OptionType>>(function Sele
                             }
                         ])
                 }}
-                components={{ Control: ControlComponent, IndicatorsContainer: IndicatorsComponent }}
+                components={{
+                    Control: ControlComponent,
+                    ValueContainer: ValueContainerComponent,
+                    IndicatorsContainer: IndicatorsComponent
+                }}
                 placeholder=""
                 styles={{
                     container: () => ({}),
@@ -146,9 +140,13 @@ const Select = forwardRef<SelectInstance, SelectProps<OptionType>>(function Sele
                     valueContainer: () => ({}),
                     singleValue: (baseStyles) => ({
                         ...baseStyles,
-                        width: `${controlRect.width - indicatorsRect.width}px`
+                        width: `${controlRect.width - indicatorsRect.width}px`,
+                        transform: `translateX(${prefixIndentPx}px)`
                     }),
-                    input: () => ({ width: `${controlRect.width - indicatorsRect.width}px` })
+                    input: () => ({
+                        width: `${controlRect.width - indicatorsRect.width}px`,
+                        transform: `translateX(${prefixIndentPx}px)`
+                    })
                 }}
                 unstyled
                 onBlur={() => setFocused(false)}
