@@ -57,6 +57,18 @@
         @apply text-danger;
     }
 }
+.field.is-disabled {
+    @apply text-n-3;
+    input {
+        @apply text-n-3;
+    }
+    .field__label {
+        @apply text-n-3;
+    }
+    .field__side {
+        @apply text-n-3/90;
+    }
+}
 
 /* VIEW FILLED */
 .field_filled {
@@ -73,7 +85,7 @@
         @apply max-w-[calc(125%-theme(space.6))] -translate-y-[20px] scale-75;
     }
 }
-.field_filled.is-focused {
+.field_filled.is-focused:not(.is-disabled) {
     .field__container {
         @apply before:border-primary before:opacity-100;
     }
@@ -81,17 +93,6 @@
 .field_filled.is-error {
     .field__container {
         @apply before:border-danger;
-    }
-}
-.field_filled.is-disabled {
-    .field__label {
-        @apply text-n-3;
-    }
-    .field__side {
-        @apply text-n-3/90;
-    }
-    input {
-        @apply text-n-3;
     }
 }
 
@@ -132,15 +133,6 @@
     .field__fieldset {
         @apply border-n-2;
     }
-    .field__label {
-        @apply text-n-3;
-    }
-    .field__side {
-        @apply text-n-3/90;
-    }
-    input {
-        @apply text-n-3;
-    }
 }
 
 /* VIEW CLEAR */
@@ -159,16 +151,5 @@
 .field_clear.is-focused {
     .field__label {
         @apply max-w-[calc(125%-theme(space.6))] -translate-y-[20px] scale-75;
-    }
-}
-.field_clear.is-disabled {
-    .field__label {
-        @apply text-n-3;
-    }
-    .field__side {
-        @apply text-n-3/90;
-    }
-    input {
-        @apply text-n-3;
     }
 }

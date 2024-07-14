@@ -133,6 +133,7 @@ const Select = forwardRef<SelectInstance, SelectProps<OptionType>>(function Sele
                     ValueContainer: ValueContainerComponent,
                     IndicatorsContainer: IndicatorsComponent
                 }}
+                isDisabled={disabled}
                 placeholder=""
                 styles={{
                     container: () => ({}),
