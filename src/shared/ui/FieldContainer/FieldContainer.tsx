@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 
 import useRect from '@/shared/lib/hooks/useRect';
 import { ValueOf } from '@/shared/lib/types';
@@ -49,30 +49,27 @@ const FieldContainer = ({
     }, []);
     const inputRect = useRect(inputRef);
 
-    const focusInput = () => {
-        if (!disabled && containerRef && !isFocused) {
-            containerRef?.current?.querySelector('input')?.focus();
-        }
-    };
-
     // To avoid jumps (focus/unfocus) when the field is focused and the user clicks inside the field, but outside the input
     const [isKeepFocus, setIsKeepFocus] = useState(false);
-    useEffect(() => {
-        if (isFocused) {
-            setIsKeepFocus(true);
-            const handleClickOutside = (e: MouseEvent) => {
-                if (!containerRef.current?.contains(e.target as Node)) {
-                    setIsKeepFocus(false);
-                }
-            };
-
-            document.addEventListener('mousedown', handleClickOutside);
-
-            return () => {
-                document.removeEventListener('mousedown', handleClickOutside);
-            };
+    const focusInput = () => {
+        inputRef.current?.addEventListener(
+            'blur',
+            () => {
+                setIsKeepFocus(false);
+            },
+            { once: true }
+        );
+        inputRef.current?.focus();
+        setIsKeepFocus(true);
+    };
+    const handleMouseDown = (e: React.MouseEvent) => {
+        if (disabled || !inputRef.current) {
+            return;
         }
-    }, [isFocused]);
+
+        e.preventDefault();
+        focusInput();
+    };
 
     return (
         <div
@@ -87,7 +84,7 @@ const FieldContainer = ({
                 [styles.field_clear]: view === FieldView.CLEAR
             })}
         >
-            <div ref={setRef} aria-hidden="true" className={cn(styles.field__container)} onClick={focusInput}>
+            <div ref={setRef} aria-hidden="true" className={cn(styles.field__container)} onMouseDown={handleMouseDown}>
                 {view === FieldView.OUTLINED && (
                     <fieldset className={styles.field__fieldset}>
                         <legend className={styles.field__legend}>
