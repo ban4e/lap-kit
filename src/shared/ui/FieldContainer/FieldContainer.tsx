@@ -98,7 +98,7 @@ const FieldContainer = ({
                         className={cn(styles.field__side, styles.field__side_prefix, {
                             'translate-y-[5px]': VIEWS_WITH_CLOSE_LABEL.includes(view) && typeof prefix === 'string'
                         })}
-                        onClick={(e) => {
+                        onMouseDown={(e) => {
                             e.stopPropagation();
                             setIsKeepFocus(false);
                         }}
@@ -113,7 +113,7 @@ const FieldContainer = ({
                         className={cn(styles.field__side, styles.field__side_suffix, {
                             'translate-y-[5px]': VIEWS_WITH_CLOSE_LABEL.includes(view) && typeof suffix === 'string'
                         })}
-                        onClick={(e) => {
+                        onMouseDown={(e) => {
                             e.stopPropagation();
                             setIsKeepFocus(false);
                         }}
