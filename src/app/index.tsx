@@ -4,6 +4,7 @@ import { Button } from '@/shared/ui/Button';
 import { Icon } from '@/shared/ui/Icon';
 import { Input } from '@/shared/ui/Input';
 import { Select } from '@/shared/ui/Select';
+import { Toggle } from '@/shared/ui/Toggle';
 
 const options = [
     { value: 'chocolate', label: 'Chocolate' },
@@ -26,6 +27,20 @@ const App = () => {
                 <Input label="Your title here" prefix="kg" view="clear" />
                 <Select isClearable label="Your label here" options={options} suffix="kg" />
                 <Select label="Your label here" options={options} suffix="kg" view="filled" />
+                <div>
+                    <Toggle>
+                        Checkbob
+                        <br /> 2 line
+                    </Toggle>
+                </div>
+                <div>
+                    <Toggle className="mr-4" name="group-1" type="radio">
+                        Radio 1
+                    </Toggle>
+                    <Toggle name="group-1" type="radio">
+                        Radio 2
+                    </Toggle>
+                </div>
                 <Button href="/" tag="a">
                     Link
                 </Button>

@@ -1,0 +1,43 @@
+.toggle {
+    @apply inline-flex;
+    &__input-container {
+        @apply relative rounded-md w-5 h-5;
+    }
+    &__input {
+        @apply absolute inset-0 rounded-inherit appearance-none outline-none cursor-pointer z-[1];
+        &:checked + .toggle__mark {
+            @apply bg-opacity-100 after:border-transparent;
+            .toggle__mark-icon {
+                @apply opacity-100;
+            }
+        }
+        &:not(:checked):not(:focus-visible) + .toggle__mark {
+            @apply after:border-n-3;
+        }
+        &:focus-visible + .toggle__mark {
+            @apply after:border-transparent after:transition before:shadow-[0_0_0_4px_theme('colors.primary')] before:opacity-50;
+        }
+    }
+    &__input[type='checkbox'] + .toggle__mark {
+        @apply rounded-inherit before:rounded-[5px];
+        .toggle__mark-icon {
+            @apply inset-0 block bg-center bg-no-repeat;
+            background-image: url('data:image/svg+xml,<svg width="12" height="10" viewBox="0 0 12 10" fill="white" xmlns="http://www.w3.org/2000/svg"><path d="M4.72978 6.52622L9.24399 0L11.2154 1.42857L5.34956 10L0.215432 6.19048L1.59423 4.19684L4.72978 6.52622Z"/></svg>');
+        }
+    }
+    &__input[type='radio'] + .toggle__mark {
+        @apply rounded-full before:rounded-full;
+        .toggle__mark-icon {
+            @apply absolute top-1/2 left-1/2 w-2.5 h-2.5 -translate-x-1/2 -translate-y-1/2 rounded-inherit bg-white;
+        }
+    }
+    &__mark {
+        @apply absolute inset-0 bg-primary bg-opacity-0 before:absolute before:inset-px before:pointer-events-none before:transition after:absolute after:inset-0 after:border after:rounded-inherit after:pointer-events-none;
+        &-icon {
+            @apply absolute opacity-0;
+        }
+    }
+    &__label {
+        @apply cursor-pointer leading-tight ml-1;
+    }
+}
