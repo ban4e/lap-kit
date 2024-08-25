@@ -1,5 +1,5 @@
 .toggle {
-    @apply inline-flex;
+    @apply relative inline-flex;
     &__input-container {
         @apply relative rounded-md w-5 h-5;
     }
@@ -39,5 +39,40 @@
     }
     &__label {
         @apply cursor-pointer leading-tight ml-1;
+    }
+    &__error {
+        @apply absolute left-0 top-full text-[11px] leading-tight text-danger;
+    }
+}
+
+/* COMMON STATES */
+.toggle.is-error:not(.is-disabled) {
+    .toggle__mark {
+        @apply bg-danger bg-opacity-0;
+    }
+    .toggle__input {
+        &:checked + .toggle__mark {
+            @apply bg-opacity-100;
+        }
+        &:not(:checked):not(:focus-visible) + .toggle__mark {
+            @apply after:border-danger;
+        }
+        &:focus-visible + .toggle__mark {
+            @apply before:shadow-[0_0_0_4px_theme('colors.danger')] before:opacity-80;
+        }
+    }
+}
+.toggle.is-disabled {
+    .toggle__mark {
+        @apply bg-n-3;
+    }
+    .toggle__label {
+        @apply cursor-default text-n-3;
+    }
+    .toggle__input {
+        @apply cursor-default;
+        &:not(:checked):not(:focus-visible) + .toggle__mark {
+            @apply after:border-transparent;
+        }
     }
 }
