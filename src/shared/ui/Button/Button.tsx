@@ -123,7 +123,7 @@ const Button: IButtonOverload = (props: IButtonProps | IAnchorProps) => {
     );
 
     if (isAnchor(props)) {
-        const { className, children, theme, fill, isLoading, ...attrs } = props; // NOTE: typings works correctly only if destuction are made inside branch
+        const { className, children, theme, fill, isLoading, ...attrs } = props; // NOTE: typings works correctly only if destruction are made inside branch
 
         return (
             <a

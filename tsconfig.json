@@ -14,11 +14,16 @@
             "vite/client",
             "jest",
             "@testing-library/jest-dom",
-            "node"
+            "node",
+            "react",
+            "react-dom"
         ],
         "plugins": [
             {
-                "name": "typescript-plugin-css-modules"
+                "name": "typescript-plugin-css-modules",
+                "postCssOptions": {
+                    "useConfig": true
+                }
             }
         ],
         "paths": {
@@ -36,16 +41,18 @@
         "isolatedModules": true,
         "noEmit": true,
         "jsx": "react-jsx",
+
         /* Linting */
         "strict": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "noFallthroughCasesInSwitch": true
+        "noFallthroughCasesInSwitch": true,
+        "noUncheckedSideEffectImports": true
     },
     "include": [
         "src",
         "types",
-        ".eslintrc.cjs",
+        "eslint.config.js",
         "vite.config.ts",
         ".prettierrc.cjs",
         "tailwind.config.cjs",
@@ -54,6 +61,7 @@
         ".storybook/main.ts",
         ".storybook/preview.tsx",
         "**/*.tsx"
+
     ],
     "references": [
         {

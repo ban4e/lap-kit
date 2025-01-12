@@ -1,6 +1,6 @@
 // TODO: Imporve displaying multiple select
 import cn from 'classnames';
-import React, { Ref, forwardRef, useCallback, useRef, useState } from 'react';
+import { Ref, forwardRef, useCallback, useRef, useState, ComponentPropsWithoutRef } from 'react';
 import ReactSelect, {
     ActionMeta,
     ControlProps,
@@ -19,7 +19,7 @@ import { FieldContainer, VIEWS_WITH_CLOSE_LABEL } from '@/shared/ui/FieldContain
 
 import styles from './Select.module.css';
 
-interface FieldContainerProps extends React.ComponentPropsWithoutRef<typeof FieldContainer> {}
+interface FieldContainerProps extends ComponentPropsWithoutRef<typeof FieldContainer> {}
 interface SelectProps<Option = unknown>
     extends Omit<FieldContainerProps, 'children'>, // ReactSelect is a children
         Omit<ReactSelectProps<Option>, keyof FieldContainerProps> {}

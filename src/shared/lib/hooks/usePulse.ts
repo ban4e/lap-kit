@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, createRef } from 'react';
 
 interface IPulseItem {
     id: number;
@@ -23,7 +23,7 @@ export default function usePulse(rect: DOMRectReadOnly) {
                     x: 'clientX' in e ? e.clientX : undefined,
                     y: 'clientY' in e ? e.clientY : undefined,
                     style: { width: 0, top: 0, left: 0 },
-                    nodeRef: React.createRef()
+                    nodeRef: createRef()
                 }
             ]);
         },

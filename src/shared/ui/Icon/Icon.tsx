@@ -1,8 +1,8 @@
-import React, { FC } from 'react';
+import { FC, SVGProps } from 'react';
 
 import useDynamicSvgImport from './useDynamicSvgImport';
 
-interface IIconProps extends React.SVGProps<SVGSVGElement> {
+interface IIconProps extends SVGProps<SVGSVGElement> {
     name: string;
 }
 

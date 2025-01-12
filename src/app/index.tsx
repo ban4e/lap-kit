@@ -29,7 +29,7 @@ const App = () => {
                 <Select label="Your label here" options={options} suffix="kg" view="filled" />
                 <div>
                     <Toggle>
-                        Checkbob
+                        Checkbox
                         <br /> 2 line
                     </Toggle>
                 </div>

@@ -6,4 +6,4 @@ module.exports = {
     printWidth: 120,
     tailwindConfig: './tailwind.config.cjs',
     plugins: ['prettier-plugin-tailwindcss']
-}
+};

@@ -1,16 +1,16 @@
 import cn from 'classnames';
-import React, { useId } from 'react';
+import React, { useId, ComponentPropsWithRef, forwardRef } from 'react';
 
 import styles from './Toggle.module.css';
 
 // TODO: problem with using type instead interface. See details https://github.com/jsx-eslint/eslint-plugin-react/issues/3284#issuecomment-1336610676
-interface IToggleProps extends React.ComponentPropsWithRef<'input'> {
+interface IToggleProps extends ComponentPropsWithRef<'input'> {
     type?: 'checkbox' | 'radio';
     error?: string;
     children?: React.ReactNode;
 }
 
-const ToggleField = React.forwardRef<HTMLInputElement, IToggleProps>(function Toggle(
+const ToggleField = forwardRef<HTMLInputElement, IToggleProps>(function Toggle(
     { type = 'checkbox', children, error, disabled, className, ...props },
     ref
 ) {
