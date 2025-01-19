@@ -18,14 +18,16 @@
             "react",
             "react-dom"
         ],
-        "plugins": [
-            {
-                "name": "typescript-plugin-css-modules",
-                "postCssOptions": {
-                    "useConfig": true
-                }
-            }
-        ],
+        // NOTE: Disable the usage of this plugin due to incorrect type declarations in some cases
+        // "plugins": [
+        //     {
+        //         "name": "typescript-plugin-css-modules",
+        //         "classnameTransform": "dashes",
+        //         "postCssOptions": {
+        //             "useConfig": true
+        //         }
+        //     }
+        // ],
         "paths": {
             "@/*": [
                 "./src/*"
@@ -51,17 +53,7 @@
     },
     "include": [
         "src",
-        "types",
-        "eslint.config.js",
-        "vite.config.ts",
-        ".prettierrc.cjs",
-        "tailwind.config.cjs",
-        "postcss.config.cjs",
-        "jest.config.cjs", // "src" is also include setupTests.ts file
-        ".storybook/main.ts",
-        ".storybook/preview.tsx",
-        "**/*.tsx"
-
+        "types"
     ],
     "references": [
         {

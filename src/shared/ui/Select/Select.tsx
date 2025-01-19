@@ -1,4 +1,4 @@
-// TODO: Imporve displaying multiple select
+// TODO: Improve displaying multiple select
 import cn from 'classnames';
 import { Ref, forwardRef, useCallback, useRef, useState, ComponentPropsWithoutRef } from 'react';
 import ReactSelect, {
@@ -19,7 +19,8 @@ import { FieldContainer, VIEWS_WITH_CLOSE_LABEL } from '@/shared/ui/FieldContain
 
 import styles from './Select.module.css';
 
-interface FieldContainerProps extends ComponentPropsWithoutRef<typeof FieldContainer> {}
+// NOTE: using type instead of interface to avoid error from eslint@typescript-eslint/no-empty-object-type
+type FieldContainerProps = ComponentPropsWithoutRef<typeof FieldContainer>;
 interface SelectProps<Option = unknown>
     extends Omit<FieldContainerProps, 'children'>, // ReactSelect is a children
         Omit<ReactSelectProps<Option>, keyof FieldContainerProps> {}
@@ -36,7 +37,7 @@ const ControlComponent = (props: ControlProps<OptionType>) => (
         {...props}
         innerProps={{
             ...props.innerProps,
-            'data-control': 'true' // NOTE: React.HTMLAttrubutes are extended with types/react.d.ts, cause data-* attrubutes does not supported by default
+            'data-control': 'true' // NOTE: React.HTMLAttributes are extended with types/react.d.ts, cause data-* Attributes does not supported by default
         }}
     />
 );
@@ -45,7 +46,7 @@ const ValueContainerComponent = (props: ValueContainerProps<OptionType>) => (
         {...props}
         innerProps={{
             ...props.innerProps,
-            'data-value-container': 'true' // NOTE: React.HTMLAttrubutes are extended with types/react.d.ts, cause data-* attrubutes does not supported by default
+            'data-value-container': 'true' // NOTE: React.HTMLAttributes are extended with types/react.d.ts, cause data-* Attributes does not supported by default
         }}
     />
 );
@@ -54,7 +55,7 @@ const IndicatorsComponent = (props: IndicatorsContainerProps<OptionType>) => (
         {...props}
         innerProps={{
             ...props.innerProps,
-            'data-indicators': 'true' // NOTE: React.HTMLAttrubutes are extended with types/react.d.ts, cause data-* attrubutes does not supported by default
+            'data-indicators': 'true' // NOTE: React.HTMLAttributes are extended with types/react.d.ts, cause data-* Attributes does not supported by default
         }}
     />
 );

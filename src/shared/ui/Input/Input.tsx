@@ -4,8 +4,9 @@ import { FieldContainer } from '@/shared/ui/FieldContainer';
 
 import InputAtomic from './InputAtomic';
 
-interface FieldContainerProps extends React.ComponentPropsWithoutRef<typeof FieldContainer> {}
-interface InputAtomicProps extends React.ComponentPropsWithRef<typeof InputAtomic> {}
+// NOTE: using type instead of interface to avoid error from eslint@typescript-eslint/no-empty-object-type
+type FieldContainerProps = React.ComponentPropsWithoutRef<typeof FieldContainer>;
+type InputAtomicProps = React.ComponentPropsWithRef<typeof InputAtomic>;
 
 interface InputProps extends Omit<FieldContainerProps, 'children'>, Omit<InputAtomicProps, keyof FieldContainerProps> {}
 

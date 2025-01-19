@@ -18,6 +18,12 @@ export default tseslint.config(
         extends: [storybook.configs['flat/recommended']]
     },
     {
+        files: ['**/*.{js,jsx,mjs,cjs}'],
+        rules: {
+            'no-undef': 2 // This rule is enabled for JavaScript files to catch references to undefined variables.
+        }
+    },
+    {
         files: ['**/*.{js,jsx,mjs,cjs,ts,tsx}'],
         extends: [
             eslint.configs.recommended,
@@ -25,6 +31,7 @@ export default tseslint.config(
             reactPlugin.configs.flat.recommended,
             reactPlugin.configs.flat['jsx-runtime'],
             reactRefresh.configs.vite,
+            jsxA11y.flatConfigs.recommended,
             eslintPluginImportX.flatConfigs.recommended,
             eslintPluginImportX.flatConfigs.typescript,
             eslintPluginPrettierRecommended
@@ -43,9 +50,7 @@ export default tseslint.config(
         },
         plugins: {
             react: reactPlugin,
-            'jsx-a11y': jsxA11y,
             'react-hooks': reactHooks
-            // 'react-refresh': reactRefresh
         },
         languageOptions: {
             // ...reactPlugin.configs.flat.recommended.languageOptions,
@@ -73,7 +78,7 @@ export default tseslint.config(
             'comma-dangle': [2, 'never'],
             'padding-line-between-statements': [2, { blankLine: 'always', prev: '*', next: 'return' }],
             'consistent-return': 0,
-            'no-undef': 2,
+            'no-undef': 0, // This rule is disabled for TypeScript files because TS type checker already ensures that variables are declared and defined.
             'no-unused-expressions': [
                 2,
                 {
