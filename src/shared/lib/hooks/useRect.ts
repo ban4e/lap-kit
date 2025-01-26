@@ -1,5 +1,5 @@
 // source: https://gist.github.com/morajabi/523d7a642d8c0a2f71fcfa0d8b3d2846
-import { useLayoutEffect, useCallback, useState } from 'react';
+import { useLayoutEffect, useCallback, useState, useRef, RefCallback } from 'react';
 
 function getRect<T extends HTMLElement>(element?: T): DOMRectReadOnly {
     let rect = {
@@ -21,40 +21,41 @@ function getRect<T extends HTMLElement>(element?: T): DOMRectReadOnly {
     return rect;
 }
 
-export default function useRect<T extends HTMLElement>(ref: React.RefObject<T>): DOMRectReadOnly {
-    const [rect, setRect] = useState<DOMRectReadOnly>(ref?.current ? getRect(ref.current) : getRect());
+export default function useRect<T extends HTMLElement>(): [RefCallback<T>, DOMRectReadOnly] {
+    const [rect, setRect] = useState<DOMRectReadOnly>(getRect());
+    const observerRef = useRef<ResizeObserver | null>(null);
+    const elementRef = useRef<T | null>(null);
 
-    const handleResize = useCallback(() => {
-        if (!ref.current) {
-            return;
+    const refCallback = useCallback((node: T | null) => {
+        if (observerRef.current) {
+            observerRef.current.disconnect();
         }
-        setRect(getRect(ref.current)); // Update client rect
-    }, [ref]);
 
+        if (node) {
+            // Initialize ResizeObserver
+            elementRef.current = node;
+            observerRef.current = new ResizeObserver(() => setRect(getRect(node)));
+            observerRef.current.observe(node);
+
+            // Perform initial measurement
+            setRect(getRect(node));
+        } else {
+            elementRef.current = null;
+        }
+    }, []);
+
+    // Measure immediately after the DOM changes (before paint)
     useLayoutEffect(() => {
-        const element = ref.current;
-        if (!element) {
-            return;
+        if (elementRef.current) {
+            setRect(getRect(elementRef.current));
         }
 
-        handleResize();
+        return () => {
+            if (observerRef.current) {
+                observerRef.current.disconnect();
+            }
+        };
+    }, []);
 
-        if (typeof ResizeObserver === 'function') {
-            let resizeObserver: ResizeObserver | null = new ResizeObserver(() => handleResize());
-            resizeObserver.observe(element);
-
-            return () => {
-                if (!resizeObserver) {
-                    return;
-                }
-                resizeObserver.disconnect();
-                resizeObserver = null;
-            };
-        }
-        window.addEventListener('resize', handleResize); // Browser support, remove freely
-
-        return () => window.removeEventListener('resize', handleResize);
-    }, [ref, handleResize]);
-
-    return rect;
+    return [refCallback, rect];
 }

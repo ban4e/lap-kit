@@ -74,24 +74,29 @@ const Select = forwardRef<SelectInstance, SelectProps<OptionType>>(function Sele
 
     // Calculate width for singleValue and inputs
     const [, setSelectRef] = useState<{ current: SelectInstance | null }>({ current: null });
-    const controlRef = useRef<HTMLElement | null>(null);
-    const indicatorsRef = useRef<HTMLElement | null>(null);
-    const valueContainerRef = useRef<HTMLElement | null>(null);
+    const [controlRef, controlRect] = useRect();
+    const [indicatorsRef, indicatorsRect] = useRect();
+    const [valueContainerRef, valueContainerRect] = useRect();
+
     const containerPaddingX = useRef<number>(0);
-    const updateSelectRef = useCallback((selectInst: SelectInstance | null) => {
-        setSelectRef({ current: selectInst || null });
-        controlRef.current = selectInst?.controlRef || null;
-        valueContainerRef.current = selectInst?.controlRef?.querySelector('[data-value-container]') || null;
-        indicatorsRef.current = selectInst?.controlRef?.querySelector('[data-indicators]') || null;
-        containerPaddingX.current = // TODO: padding changes are not supported (apply to hook same as useRect)
-            (valueContainerRef.current &&
-                parseFloat(getComputedStyle(valueContainerRef.current, null).getPropertyValue('padding-left'))) ||
-            0;
-    }, []);
+    const updateSelectRef = useCallback(
+        (selectInst: SelectInstance | null) => {
+            const valueContainerEl: HTMLElement | null =
+                selectInst?.controlRef?.querySelector('[data-value-container]') || null;
+
+            setSelectRef({ current: selectInst || null });
+            controlRef(selectInst?.controlRef || null);
+            indicatorsRef(selectInst?.controlRef?.querySelector('[data-indicators]') || null);
+            valueContainerRef(valueContainerEl);
+
+            containerPaddingX.current =
+                (valueContainerEl &&
+                    parseFloat(getComputedStyle(valueContainerEl, null).getPropertyValue('padding-left'))) ||
+                0;
+        },
+        [controlRef, indicatorsRef, valueContainerRef]
+    );
     const selectCombinedRef = useCombinedRefs(ref, updateSelectRef);
-    const controlRect = useRect(controlRef); // TODO: do it in one hook
-    const indicatorsRect = useRect(indicatorsRef);
-    const valueContainerRect = useRect(valueContainerRef);
 
     const prefixIndentPx = controlRect.x - valueContainerRect.x - containerPaddingX.current;
 

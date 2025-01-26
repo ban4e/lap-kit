@@ -8,9 +8,10 @@
         @apply field-spacing-x relative flex h-12 cursor-text items-center;
     }
     &__label {
-        @apply pointer-events-none absolute left-3 top-1/2 max-w-[calc(100%-theme(space.6))] origin-top-left -translate-y-1/2 transform truncate leading-tight text-n-4 transition dark:text-n-5;
+        @apply pointer-events-none absolute left-3 top-1/2 max-w-[calc(100%-theme(space.6))] origin-top-left -translate-y-1/2 transform truncate leading-tight text-n-4 ease-in dark:text-n-5;
         transition-property: color, transform, max-width;
-        transition-delay: 0s, 0s, 0.01s;
+        transition-delay: 0s, 0s, 50ms;
+        transition-duration: 150ms, 150ms, 150ms;
     }
     input {
         @apply relative block h-full w-full resize-none rounded-inherit border-none bg-transparent leading-tight text-foreground outline-none transition dark:text-white;

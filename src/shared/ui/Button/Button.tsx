@@ -1,5 +1,5 @@
 import cn from 'classnames';
-import React, { useRef } from 'react';
+import React from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import usePulse from '@/shared/lib/hooks/usePulse';
@@ -54,8 +54,7 @@ const Button: IButtonOverload = (props: IButtonProps | IAnchorProps) => {
     // Getting props to set default value
     const withPulse: typeof props.withPulse = 'withPulse' in props ? props.withPulse : true;
 
-    const buttonRef = useRef<HTMLButtonElement | HTMLAnchorElement | null>(null);
-    const buttonRect = useRect(buttonRef);
+    const [buttonRefCallback, buttonRect] = useRect();
     const { pulseItems, pulseClick, handlePulseEnter, handlePulseEntered } = usePulse(buttonRect);
 
     const handleClick = (
@@ -127,9 +126,7 @@ const Button: IButtonOverload = (props: IButtonProps | IAnchorProps) => {
 
         return (
             <a
-                ref={(node) => {
-                    buttonRef.current = node;
-                }}
+                ref={buttonRefCallback}
                 {...attrs}
                 className={cn(rootClass, className)}
                 role="button"
@@ -146,14 +143,7 @@ const Button: IButtonOverload = (props: IButtonProps | IAnchorProps) => {
     const { className, children, theme, fill, isLoading, ...attrs } = props;
 
     return (
-        <button
-            ref={(node) => {
-                buttonRef.current = node;
-            }}
-            {...attrs}
-            className={cn(rootClass, className)}
-            onClick={handleClick}
-        >
+        <button ref={buttonRefCallback} {...attrs} className={cn(rootClass, className)} onClick={handleClick}>
             {content}
         </button>
     );

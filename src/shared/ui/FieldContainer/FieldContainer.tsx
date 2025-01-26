@@ -41,35 +41,56 @@ const FieldContainer = ({
     prefix,
     rootRef
 }: IFieldContainerProps) => {
-    const containerRef = useRef<HTMLDivElement | null>(null);
-    const [inputRef, setInputRef] = useState<{ current: HTMLDivElement | null }>({ current: null });
-    const setRef = useCallback((newNode: HTMLDivElement | null) => {
-        containerRef.current = newNode;
-        setInputRef({ current: newNode?.querySelector('input') || null });
-    }, []);
-    const inputRect = useRect(inputRef);
+    const inputRef = useRef<HTMLInputElement | null>(null);
+    const [inputRefCallback, inputRect] = useRect();
+    const setRef = useCallback(
+        (node: HTMLDivElement | null) => {
+            const inputNode = node?.querySelector('input') || null;
+            inputRefCallback(inputNode);
+            inputRef.current = inputNode;
+        },
+        [inputRefCallback]
+    );
 
     // To avoid jumps (focus/unfocus) when the field is focused and the user clicks inside the field, but outside the input
     const [isKeepFocus, setIsKeepFocus] = useState(false);
+    const [delayedIsFocused, setDelayedIsFocused] = useState(false); // To avoid label overflows suffix element in moment of animation start, but it invokes additional render (CSS delay not working)
     const focusInput = () => {
         inputRef.current?.addEventListener(
             'blur',
             () => {
                 setIsKeepFocus(false);
+                setTimeout(() => {
+                    setDelayedIsFocused(false);
+                }, 50);
             },
             { once: true }
         );
         inputRef.current?.focus();
         setIsKeepFocus(true);
+        setTimeout(() => {
+            setDelayedIsFocused(true);
+        }, 100);
     };
-    const handleMouseDown = (e: React.MouseEvent) => {
+
+    const handlePointerDown = (e: React.PointerEvent) => {
         if (disabled || !inputRef.current) {
             return;
         }
 
-        e.preventDefault();
+        // To prevent lose focus from input clicking in area of container
+        e.target !== inputRef.current && e.preventDefault();
         focusInput();
     };
+
+    // Loose focus on prefix/suffix pointerDown event
+    const handleSidePointerDown = useCallback((e: React.PointerEvent) => {
+        e.stopPropagation();
+        setIsKeepFocus(false);
+        setTimeout(() => {
+            setDelayedIsFocused(false);
+        }, 50);
+    }, []);
 
     return (
         <div
@@ -84,7 +105,12 @@ const FieldContainer = ({
                 [styles.field_clear]: view === FieldView.CLEAR
             })}
         >
-            <div ref={setRef} aria-hidden="true" className={cn(styles.field__container)} onMouseDown={handleMouseDown}>
+            <div
+                ref={setRef}
+                aria-hidden="true"
+                className={cn(styles.field__container)}
+                onPointerDown={handlePointerDown}
+            >
                 {view === FieldView.OUTLINED && (
                     <fieldset className={styles.field__fieldset}>
                         <legend className={styles.field__legend}>
@@ -98,10 +124,7 @@ const FieldContainer = ({
                         className={cn(styles.field__side, styles.field__side_prefix, {
                             'translate-y-[5px]': VIEWS_WITH_CLOSE_LABEL.includes(view) && typeof prefix === 'string'
                         })}
-                        onMouseDown={(e) => {
-                            e.stopPropagation();
-                            setIsKeepFocus(false);
-                        }}
+                        onPointerDown={handleSidePointerDown}
                     >
                         {prefix}
                     </span>
@@ -113,10 +136,7 @@ const FieldContainer = ({
                         className={cn(styles.field__side, styles.field__side_suffix, {
                             'translate-y-[5px]': VIEWS_WITH_CLOSE_LABEL.includes(view) && typeof suffix === 'string'
                         })}
-                        onMouseDown={(e) => {
-                            e.stopPropagation();
-                            setIsKeepFocus(false);
-                        }}
+                        onPointerDown={handleSidePointerDown}
                     >
                         {suffix}
                     </span>
@@ -124,7 +144,7 @@ const FieldContainer = ({
                 {label && (
                     <span
                         className={styles.field__label}
-                        style={{ width: isKeepFocus || isFilled || prefix ? 'auto' : `${inputRect.width}px` }}
+                        style={{ width: delayedIsFocused || isFilled || prefix ? 'auto' : `${inputRect.width}px` }}
                     >
                         {label}
                     </span>

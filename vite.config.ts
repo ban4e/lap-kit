@@ -25,6 +25,7 @@ export default defineConfig(({ mode }) => ({
     css: {
         devSourcemap: true,
         modules: {
+            localsConvention: 'camelCase',
             generateScopedName: mode === 'development' ? '[name]__[local]' : '_[local]_[hash:base64:2]'
         }
     }

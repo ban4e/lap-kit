@@ -1,7 +1,7 @@
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
 
 export default function useDynamicSvgImport(iconName: string) {
-    const importedIconRef = useRef<React.FC<React.SVGProps<SVGElement>>>();
+    const importedIconRef = useRef<React.FC<React.SVGProps<SVGElement>>>(null);
     const [size, setSize] = useState<{ width: number; height: number } | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<unknown>();
@@ -16,8 +16,8 @@ export default function useDynamicSvgImport(iconName: string) {
                 // NOTE: Template string causes error in IntelliJ IDEA IßDE
                 importedIconRef.current = (await import(`@assets/icons/${iconName}.svg`)).default; // SVGR provides ReactComponent for given svg path
                 const componentData = importedIconRef.current?.({});
-                const width = (componentData as ReactElement)?.props?.width;
-                const height = (componentData as ReactElement)?.props?.height;
+                const width = (componentData as ReactElement<React.SVGProps<SVGElement>>)?.props?.width;
+                const height = (componentData as ReactElement<React.SVGProps<SVGElement>>)?.props?.height;
                 if (typeof width === 'number' && typeof height === 'number') {
                     setSize({ width, height });
                 }
