@@ -1,14 +1,15 @@
-// TODO: Improve displaying multiple select
+// TODO: Improve displaying multiple select; Check multiselect change with null
 import cn from 'classnames';
-import { Ref, forwardRef, useCallback, useRef, useState, ComponentPropsWithoutRef } from 'react';
+import { Ref, useCallback, useMemo, useRef, useState } from 'react';
 import ReactSelect, {
     ActionMeta,
     ControlProps,
+    GroupBase,
     IndicatorsContainerProps,
-    MultiValue,
+    OnChangeValue,
+    PropsValue,
     Props as ReactSelectProps,
     SelectInstance,
-    SingleValue,
     ValueContainerProps,
     components
 } from 'react-select';
@@ -19,20 +20,36 @@ import { FieldContainer, VIEWS_WITH_CLOSE_LABEL } from '@/shared/ui/FieldContain
 
 import styles from './Select.module.css';
 
-// NOTE: using type instead of interface to avoid error from eslint@typescript-eslint/no-empty-object-type
-type FieldContainerProps = ComponentPropsWithoutRef<typeof FieldContainer>;
-interface SelectProps<Option = unknown>
-    extends Omit<FieldContainerProps, 'children'>, // ReactSelect is a children
-        Omit<ReactSelectProps<Option>, keyof FieldContainerProps> {}
-
 type OptionType = { label: string; value: number | string };
-type OnChange = (
-    value: SingleValue<OptionType> | MultiValue<OptionType> | null,
-    actionMeta: ActionMeta<OptionType>
-) => void;
+type TSelectReturnValue<T> = T | number | string | null;
+type TFieldContainerProps = React.ComponentProps<typeof FieldContainer>;
+
+type TSelectProps<
+    Option = unknown,
+    IsMulti extends boolean = false,
+    Group extends GroupBase<Option> = GroupBase<Option>
+> = Omit<TFieldContainerProps, 'children'> & // ReactSelect is a children
+    Omit<ReactSelectProps<Option, IsMulti, Group>, keyof TFieldContainerProps | 'value'> & {
+        value?: IsMulti extends true ? TSelectReturnValue<Option>[] : TSelectReturnValue<Option>;
+        ref?: React.RefObject<SelectInstance> | React.RefCallback<SelectInstance>;
+        /** Specify to get the value from one of property in Option */
+        valueKey?: string;
+    };
+type TSingleSelectProps = Omit<TSelectProps<OptionType, false>, 'onChange'> & {
+    onChange?: (newValue: TSelectReturnValue<OptionType>, actionMeta: ActionMeta<OptionType>) => void;
+};
+type TMultiSelectProps = Omit<TSelectProps<OptionType, true>, 'onChange'> & {
+    onChange?: (newValue: TSelectReturnValue<OptionType>[], actionMeta: ActionMeta<OptionType>) => void;
+};
 
 /** *** CUSTOM COMPONENTS **** */
-const ControlComponent = (props: ControlProps<OptionType>) => (
+const ControlComponent = <
+    Option = OptionType,
+    IsMulti extends boolean = false,
+    Group extends GroupBase<Option> = GroupBase<Option>
+>(
+    props: ControlProps<Option, IsMulti, Group>
+) => (
     <components.Control
         {...props}
         innerProps={{
@@ -41,7 +58,13 @@ const ControlComponent = (props: ControlProps<OptionType>) => (
         }}
     />
 );
-const ValueContainerComponent = (props: ValueContainerProps<OptionType>) => (
+const ValueContainerComponent = <
+    Option = OptionType,
+    IsMulti extends boolean = false,
+    Group extends GroupBase<Option> = GroupBase<Option>
+>(
+    props: ValueContainerProps<Option, IsMulti, Group>
+) => (
     <components.ValueContainer
         {...props}
         innerProps={{
@@ -50,7 +73,13 @@ const ValueContainerComponent = (props: ValueContainerProps<OptionType>) => (
         }}
     />
 );
-const IndicatorsComponent = (props: IndicatorsContainerProps<OptionType>) => (
+const IndicatorsComponent = <
+    Option = OptionType,
+    IsMulti extends boolean = false,
+    Group extends GroupBase<Option> = GroupBase<Option>
+>(
+    props: IndicatorsContainerProps<Option, IsMulti, Group>
+) => (
     <components.IndicatorsContainer
         {...props}
         innerProps={{
@@ -60,16 +89,70 @@ const IndicatorsComponent = (props: IndicatorsContainerProps<OptionType>) => (
     />
 );
 
-const Select = forwardRef<SelectInstance, SelectProps<OptionType>>(function SelectField(
-    { view, className, label, error, disabled, suffix, prefix, ...props },
-    ref
-) {
-    const [focused, setFocused] = useState(false);
-    const [filled, setFilled] = useState(Boolean(props.value));
+const checkOptionIsGroup = <Option = OptionType,>(option: Option | GroupBase<Option>): option is GroupBase<Option> => {
+    return option && typeof option === 'object' && 'options' in option;
+};
 
-    const handleChange: OnChange = (option, meta) => {
+const findSelectedOption = <Option = OptionType, IsMulti extends boolean = false>({
+    value,
+    valueKey,
+    options
+}: {
+    value: TSelectProps<Option, IsMulti>['value'];
+    valueKey: keyof Option;
+    options: TSelectProps<Option, IsMulti>['options'];
+}): Option | Option[] | undefined => {
+    if (Array.isArray(value)) {
+        return options?.filter((item) => {
+            return checkOptionIsGroup(item)
+                ? item.options.filter((gropedOption) => gropedOption[valueKey]).flat() // TODO: check this branch is correct
+                : value.includes(item[valueKey] as TSelectReturnValue<Option>);
+        }) as Option[];
+    }
+
+    return options?.find((item) => {
+        return checkOptionIsGroup(item)
+            ? item.options.find((gropedOption) => gropedOption[valueKey] === value)
+            : item[valueKey] === value;
+    }) as Option;
+};
+
+const SelectBase = <Option, IsMulti extends boolean>({
+    ref,
+    view,
+    className,
+    label,
+    error,
+    disabled,
+    suffix,
+    prefix,
+    value,
+    valueKey = 'value',
+    isSearchable = false,
+    menuIsOpen = false,
+    onChange,
+    ...props
+}: TSelectProps<Option, IsMulti>) => {
+    const [focused, setFocused] = useState(false);
+    const [filled, setFilled] = useState(Boolean(value));
+
+    // Transform value (string | number) to Option type, because of react-select accept only Option type
+    const selectValue: PropsValue<Option> | undefined = useMemo(() => {
+        return (
+            (valueKey &&
+                findSelectedOption({
+                    value,
+                    valueKey: valueKey as keyof Option,
+                    options: props.options
+                })) ||
+            (value as PropsValue<Option>)
+        );
+    }, [value, valueKey, props.options]);
+
+    const handleChange: ReactSelectProps<Option>['onChange'] = (option, meta) => {
         option ? setFilled(true) : setFilled(false);
-        props.onChange && props.onChange(option, meta);
+
+        typeof onChange === 'function' && onChange(option as OnChangeValue<Option, IsMulti>, meta);
     };
 
     // Calculate width for singleValue and inputs
@@ -107,6 +190,7 @@ const Select = forwardRef<SelectInstance, SelectProps<OptionType>>(function Sele
             error={error}
             isFilled={filled}
             isFocused={focused}
+            isPreventPointerDownEvent={false}
             label={label}
             prefix={prefix}
             suffix={suffix}
@@ -114,7 +198,7 @@ const Select = forwardRef<SelectInstance, SelectProps<OptionType>>(function Sele
         >
             <ReactSelect
                 {...props}
-                ref={selectCombinedRef as Ref<SelectInstance<OptionType>>}
+                ref={selectCombinedRef as Ref<SelectInstance<Option, IsMulti>>}
                 classNames={{
                     container: () => styles.select,
                     control: () => cn(styles['select-control']),
@@ -130,7 +214,8 @@ const Select = forwardRef<SelectInstance, SelectProps<OptionType>>(function Sele
                         cn([
                             styles['select-option'],
                             {
-                                [styles['select-option_selected']]: state.isSelected
+                                [styles['select-option_selected']]: state.isSelected,
+                                [styles['select-option_focused']]: state.isFocused
                             }
                         ])
                 }}
@@ -140,6 +225,7 @@ const Select = forwardRef<SelectInstance, SelectProps<OptionType>>(function Sele
                     IndicatorsContainer: IndicatorsComponent
                 }}
                 isDisabled={disabled}
+                // menuIsOpen={focused || menuIsOpen}
                 placeholder=""
                 styles={{
                     container: () => ({}),
@@ -156,12 +242,40 @@ const Select = forwardRef<SelectInstance, SelectProps<OptionType>>(function Sele
                     })
                 }}
                 unstyled
+                value={selectValue}
                 onBlur={() => setFocused(false)}
                 onChange={handleChange}
                 onFocus={() => setFocused(true)}
             />
         </FieldContainer>
     );
-});
+};
 
-export default Select;
+const Select = ({ onChange, valueKey, ...props }: TSingleSelectProps) => {
+    const handleChange: TSelectProps<OptionType, false>['onChange'] = (option, meta) => {
+        if (typeof onChange !== 'function') {
+            return;
+        }
+
+        onChange(valueKey ? option?.[valueKey as keyof OptionType] || null : option, meta);
+    };
+
+    return <SelectBase {...props} valueKey={valueKey} onChange={handleChange} />;
+};
+
+const MultiSelect = ({ onChange, valueKey, ...props }: TMultiSelectProps) => {
+    const handleChange: TSelectProps<OptionType, true>['onChange'] = (option, meta) => {
+        if (typeof onChange !== 'function') {
+            return;
+        }
+
+        onChange(
+            option.map((item: OptionType) => (valueKey ? item[valueKey as keyof OptionType] : item)),
+            meta
+        );
+    };
+
+    return <SelectBase {...props} valueKey={valueKey} onChange={handleChange} />;
+};
+
+export { Select, MultiSelect };

@@ -17,6 +17,9 @@
         &_selected {
             @apply bg-n-1 text-foreground;
         }
+        &_focused {
+            @apply text-foreground;
+        }
     }
     &-input-container {
         grid-area: 1 / 1 / 2 / 3;

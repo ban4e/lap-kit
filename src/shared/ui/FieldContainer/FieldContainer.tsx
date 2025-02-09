@@ -24,6 +24,8 @@ export interface IFieldContainerProps {
     suffix?: React.ReactNode;
     prefix?: React.ReactNode;
     rootRef?: React.Ref<HTMLDivElement> | null;
+    /** Cancels the default event when the container is clicked for focusing the input. */
+    isPreventPointerDownEvent?: boolean;
 }
 
 export const VIEWS_WITH_CLOSE_LABEL: ValueOf<typeof FieldView>[] = [FieldView.CLEAR, FieldView.FILLED];
@@ -39,7 +41,8 @@ const FieldContainer = ({
     children,
     suffix,
     prefix,
-    rootRef
+    rootRef,
+    isPreventPointerDownEvent = true
 }: IFieldContainerProps) => {
     const inputRef = useRef<HTMLInputElement | null>(null);
     const [inputRefCallback, inputRect] = useRect();
@@ -79,7 +82,7 @@ const FieldContainer = ({
         }
 
         // To prevent lose focus from input clicking in area of container
-        e.target !== inputRef.current && e.preventDefault();
+        isPreventPointerDownEvent && e.target !== inputRef.current && e.preventDefault();
         focusInput();
     };
 
