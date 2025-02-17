@@ -3,8 +3,11 @@
     &-control {
         @apply static flex h-full flex-wrap items-center justify-between border-none outline-none;
     }
+    &-single-value {
+        @apply flex items-center h-full;
+    }
     &-value {
-        @apply absolute inset-0 grid flex-1 items-center overflow-hidden px-3;
+        @apply absolute inset-0 flex flex-1 items-center overflow-hidden px-3;
     }
     &-indicators-container {
         @apply relative ml-auto;
@@ -20,8 +23,5 @@
         &_focused {
             @apply text-foreground;
         }
-    }
-    &-input-container {
-        grid-area: 1 / 1 / 2 / 3;
     }
 }

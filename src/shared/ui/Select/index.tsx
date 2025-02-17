@@ -1,1 +1,1 @@
-export { Select, MultiSelect } from './Select';
+export { Select } from './Select';

@@ -25,8 +25,9 @@ const App = () => {
                 <Input label="Your label here" prefix="kg" suffix="mass" view="filled" />
                 <Input label="Your label here" view="filled" />
                 <Input label="Your title here" prefix="kg" view="clear" />
-                <Select isClearable label="Your label here" options={options} suffix="kg" />
+                <Select isClearable isSearchable label="Your label here" options={options} suffix="kg" />
                 <Select label="Your label here" options={options} suffix="kg" view="filled" />
+                <Select isMulti label="Your label here" options={options} view="filled" />
                 <div>
                     <Toggle>
                         Checkbox

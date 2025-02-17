@@ -48,8 +48,9 @@ const FieldContainer = ({
     const [inputRefCallback, inputRect] = useRect();
     const setRef = useCallback(
         (node: HTMLDivElement | null) => {
+            const inputContainerNode: HTMLElement | null = node?.querySelector('[data-input-container]') || null;
             const inputNode = node?.querySelector('input') || null;
-            inputRefCallback(inputNode);
+            inputRefCallback(inputContainerNode || inputNode);
             inputRef.current = inputNode;
         },
         [inputRefCallback]

@@ -1,9 +1,9 @@
-// TODO: Improve displaying multiple select; Check multiselect change with null
+// TODO: Add multiselect checkboxes to option; Remove focus after multiselect is cleared by clicking button
 import cn from 'classnames';
-import { Ref, useCallback, useMemo, useRef, useState } from 'react';
+import { Children, isValidElement, memo, Ref, useCallback, useMemo, useRef, useState } from 'react';
 import ReactSelect, {
-    ActionMeta,
     ControlProps,
+    FormatOptionLabelMeta,
     GroupBase,
     IndicatorsContainerProps,
     OnChangeValue,
@@ -28,19 +28,13 @@ type TSelectProps<
     Option = unknown,
     IsMulti extends boolean = false,
     Group extends GroupBase<Option> = GroupBase<Option>
-> = Omit<TFieldContainerProps, 'children'> & // ReactSelect is a children
-    Omit<ReactSelectProps<Option, IsMulti, Group>, keyof TFieldContainerProps | 'value'> & {
+> = Omit<TFieldContainerProps, 'children' | 'isFilled' | 'isFocused'> & // ReactSelect is a children
+    Omit<ReactSelectProps<Option, IsMulti, Group>, keyof TFieldContainerProps | 'value' | 'placeholder'> & {
         value?: IsMulti extends true ? TSelectReturnValue<Option>[] : TSelectReturnValue<Option>;
         ref?: React.RefObject<SelectInstance> | React.RefCallback<SelectInstance>;
         /** Specify to get the value from one of property in Option */
         valueKey?: string;
     };
-type TSingleSelectProps = Omit<TSelectProps<OptionType, false>, 'onChange'> & {
-    onChange?: (newValue: TSelectReturnValue<OptionType>, actionMeta: ActionMeta<OptionType>) => void;
-};
-type TMultiSelectProps = Omit<TSelectProps<OptionType, true>, 'onChange'> & {
-    onChange?: (newValue: TSelectReturnValue<OptionType>[], actionMeta: ActionMeta<OptionType>) => void;
-};
 
 /** *** CUSTOM COMPONENTS **** */
 const ControlComponent = <
@@ -62,17 +56,65 @@ const ValueContainerComponent = <
     Option = OptionType,
     IsMulti extends boolean = false,
     Group extends GroupBase<Option> = GroupBase<Option>
->(
-    props: ValueContainerProps<Option, IsMulti, Group>
-) => (
-    <components.ValueContainer
-        {...props}
-        innerProps={{
-            ...props.innerProps,
-            'data-value-container': 'true' // NOTE: React.HTMLAttributes are extended with types/react.d.ts, cause data-* Attributes does not supported by default
-        }}
-    />
-);
+>({
+    children,
+    ...props
+}: ValueContainerProps<Option, IsMulti, Group>) => {
+    const getText = props.selectProps.getOptionValue;
+    const { getOptionLabel, formatOptionLabel } = props.selectProps;
+    const selectedValues = props.getValue();
+    const selectedLabels =
+        props.isMulti &&
+        selectedValues
+            .map((option) => {
+                if (formatOptionLabel) {
+                    // Create the `FormatOptionLabelMeta` object
+                    const meta: FormatOptionLabelMeta<Option> = {
+                        context: 'value',
+                        inputValue: '', // Provide the current input value (if available)
+                        selectValue: selectedValues // Provide the current selected values
+                    };
+
+                    return formatOptionLabel(option, meta);
+                }
+
+                // Fall back to `getOptionLabel` or the default label
+                return getOptionLabel ? getOptionLabel(option) : getText(option);
+            })
+            .join(', ');
+
+    return (
+        <components.ValueContainer
+            {...props}
+            innerProps={{
+                ...props.innerProps,
+                'data-value-container': 'true' // NOTE: React.HTMLAttributes are extended with types/react.d.ts, cause data-* Attributes does not supported by default
+            }}
+        >
+            {/* data-input-container is used by FieldContainer to detect width */}
+            <div
+                className="relative grid h-full w-full grid-flow-col overflow-hidden"
+                data-input-container="true"
+                data-value-container-inner="true"
+            >
+                {props.isMulti && (
+                    <span className="absolute inset-0 flex items-center">
+                        <span className="truncate">{selectedLabels}</span>
+                    </span>
+                )}
+                {Children.map(children, (child) => {
+                    // Render input and single value
+                    if (isValidElement(child) && child.key !== 'placeholder') {
+                        return child;
+                    }
+
+                    return null;
+                })}
+            </div>
+        </components.ValueContainer>
+    );
+};
+
 const IndicatorsComponent = <
     Option = OptionType,
     IsMulti extends boolean = false,
@@ -117,7 +159,14 @@ const findSelectedOption = <Option = OptionType, IsMulti extends boolean = false
     }) as Option;
 };
 
-const SelectBase = <Option, IsMulti extends boolean>({
+const selectComponents = {
+    Control: ControlComponent,
+    ValueContainer: ValueContainerComponent,
+    IndicatorsContainer: IndicatorsComponent,
+    MultiValue: () => null
+};
+
+const Select = memo(function Select<Option, IsMulti extends boolean>({
     ref,
     view,
     className,
@@ -130,9 +179,10 @@ const SelectBase = <Option, IsMulti extends boolean>({
     valueKey = 'value',
     isSearchable = false,
     menuIsOpen = false,
+    isMulti = false as IsMulti,
     onChange,
     ...props
-}: TSelectProps<Option, IsMulti>) => {
+}: TSelectProps<Option, IsMulti>) {
     const [focused, setFocused] = useState(false);
     const [filled, setFilled] = useState(Boolean(value));
 
@@ -149,39 +199,39 @@ const SelectBase = <Option, IsMulti extends boolean>({
         );
     }, [value, valueKey, props.options]);
 
-    const handleChange: ReactSelectProps<Option>['onChange'] = (option, meta) => {
-        option ? setFilled(true) : setFilled(false);
-
-        typeof onChange === 'function' && onChange(option as OnChangeValue<Option, IsMulti>, meta);
-    };
-
     // Calculate width for singleValue and inputs
-    const [, setSelectRef] = useState<{ current: SelectInstance | null }>({ current: null });
-    const [controlRef, controlRect] = useRect();
-    const [indicatorsRef, indicatorsRect] = useRect();
-    const [valueContainerRef, valueContainerRect] = useRect();
+    const [controlRefCb, controlRect] = useRect();
+    const [indicatorsRefCb, indicatorsRect] = useRect();
+    const [fieldContainerRefCb, fieldContainerRect] = useRect();
 
-    const containerPaddingX = useRef<number>(0);
+    const containerPaddingLeft = useRef<number>(0);
+    const selectRef = useRef<SelectInstance | null>(null);
     const updateSelectRef = useCallback(
         (selectInst: SelectInstance | null) => {
+            selectRef.current = selectInst;
             const valueContainerEl: HTMLElement | null =
                 selectInst?.controlRef?.querySelector('[data-value-container]') || null;
+            controlRefCb(selectInst?.controlRef || null);
+            indicatorsRefCb(selectInst?.controlRef?.querySelector('[data-indicators]') || null);
 
-            setSelectRef({ current: selectInst || null });
-            controlRef(selectInst?.controlRef || null);
-            indicatorsRef(selectInst?.controlRef?.querySelector('[data-indicators]') || null);
-            valueContainerRef(valueContainerEl);
-
-            containerPaddingX.current =
+            containerPaddingLeft.current =
                 (valueContainerEl &&
                     parseFloat(getComputedStyle(valueContainerEl, null).getPropertyValue('padding-left'))) ||
                 0;
         },
-        [controlRef, indicatorsRef, valueContainerRef]
+        [controlRefCb, indicatorsRefCb]
     );
     const selectCombinedRef = useCombinedRefs(ref, updateSelectRef);
 
-    const prefixIndentPx = controlRect.x - valueContainerRect.x - containerPaddingX.current;
+    const handleChange: ReactSelectProps<Option>['onChange'] = (option, meta) => {
+        option ? setFilled(isMulti && Array.isArray(option) ? !!option.length : true) : setFilled(false);
+
+        typeof onChange === 'function' && onChange(option as OnChangeValue<Option, IsMulti>, meta);
+    };
+
+    const inputWidth = controlRect.width - indicatorsRect.width;
+    const containerPaddingLeftPx = containerPaddingLeft.current;
+    const prefixIndentPx = controlRect.x - fieldContainerRect.x;
 
     return (
         <FieldContainer
@@ -193,6 +243,7 @@ const SelectBase = <Option, IsMulti extends boolean>({
             isPreventPointerDownEvent={false}
             label={label}
             prefix={prefix}
+            rootRef={fieldContainerRefCb}
             suffix={suffix}
             view={view}
         >
@@ -217,28 +268,40 @@ const SelectBase = <Option, IsMulti extends boolean>({
                                 [styles['select-option_selected']]: state.isSelected,
                                 [styles['select-option_focused']]: state.isFocused
                             }
-                        ])
+                        ]),
+                    singleValue: () => styles['select-single-value']
                 }}
-                components={{
-                    Control: ControlComponent,
-                    ValueContainer: ValueContainerComponent,
-                    IndicatorsContainer: IndicatorsComponent
-                }}
+                components={selectComponents}
                 isDisabled={disabled}
-                // menuIsOpen={focused || menuIsOpen}
+                isMulti={isMulti}
+                isSearchable={isSearchable}
                 placeholder=""
                 styles={{
+                    clearIndicator: (baseStyles) => ({
+                        ...baseStyles,
+                        cursor: 'default'
+                    }),
                     container: () => ({}),
                     control: () => ({}),
-                    valueContainer: () => ({}),
-                    singleValue: (baseStyles) => ({
-                        ...baseStyles,
-                        width: `${controlRect.width - indicatorsRect.width}px`,
-                        transform: `translateX(${prefixIndentPx}px)`
+                    valueContainer: () => ({
+                        // See details https://github.com/JedWatson/react-select/issues/3995
+                        'input[aria-readonly="true"]': {
+                            position: 'absolute',
+                            left: 0,
+                            transform: 'none',
+                            width: '2px'
+                        },
+                        input: {
+                            maxWidth: `${inputWidth}px`,
+                            padding: 0
+                        },
+                        '[data-value-container-inner]': {
+                            width: `${inputWidth}px`,
+                            transform: `translateX(${prefixIndentPx - containerPaddingLeftPx}px)`
+                        }
                     }),
-                    input: () => ({
-                        width: `${controlRect.width - indicatorsRect.width}px`,
-                        transform: `translateX(${prefixIndentPx}px)`
+                    singleValue: (baseStyles) => ({
+                        ...baseStyles
                     })
                 }}
                 unstyled
@@ -249,33 +312,6 @@ const SelectBase = <Option, IsMulti extends boolean>({
             />
         </FieldContainer>
     );
-};
+});
 
-const Select = ({ onChange, valueKey, ...props }: TSingleSelectProps) => {
-    const handleChange: TSelectProps<OptionType, false>['onChange'] = (option, meta) => {
-        if (typeof onChange !== 'function') {
-            return;
-        }
-
-        onChange(valueKey ? option?.[valueKey as keyof OptionType] || null : option, meta);
-    };
-
-    return <SelectBase {...props} valueKey={valueKey} onChange={handleChange} />;
-};
-
-const MultiSelect = ({ onChange, valueKey, ...props }: TMultiSelectProps) => {
-    const handleChange: TSelectProps<OptionType, true>['onChange'] = (option, meta) => {
-        if (typeof onChange !== 'function') {
-            return;
-        }
-
-        onChange(
-            option.map((item: OptionType) => (valueKey ? item[valueKey as keyof OptionType] : item)),
-            meta
-        );
-    };
-
-    return <SelectBase {...props} valueKey={valueKey} onChange={handleChange} />;
-};
-
-export { Select, MultiSelect };
+export { Select };
