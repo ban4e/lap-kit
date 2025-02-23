@@ -5,6 +5,7 @@ import { Icon } from '@/shared/ui/Icon';
 import { Input } from '@/shared/ui/Input';
 import { Select } from '@/shared/ui/Select';
 import { Toggle } from '@/shared/ui/Toggle';
+import { Tooltip } from '@/shared/ui/Tooltip';
 
 const options = [
     { value: 'chocolate', label: 'Chocolate' },
@@ -28,6 +29,12 @@ const App = () => {
                 <Select isClearable isSearchable label="Your label here" options={options} suffix="kg" />
                 <Select label="Your label here" options={options} suffix="kg" view="filled" />
                 <Select isMulti label="Your label here" options={options} view="filled" />
+                <div>
+                    <Tooltip autoOpen placement="left">
+                        <Tooltip.Trigger />
+                        <Tooltip.Content>123</Tooltip.Content>
+                    </Tooltip>
+                </div>
                 <div>
                     <Toggle>
                         Checkbox

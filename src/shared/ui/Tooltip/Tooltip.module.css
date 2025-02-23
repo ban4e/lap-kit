@@ -1,0 +1,23 @@
+.tooltip {
+    @apply text-xs rounded-md z-50;
+    &__content {
+        @apply p-1.5;
+    }
+}
+
+/* PRIMARY */
+.tooltip_primary {
+    @apply bg-foreground text-background;
+    .tooltip__arrow {
+        @apply fill-foreground;
+    }
+}
+
+
+/* PRIMARY_INVERT */
+.tooltip_primary-invert {
+    @apply bg-white text-foreground shadow-sm;
+    .tooltip__arrow {
+        @apply fill-white drop-shadow-sm;
+    }
+}

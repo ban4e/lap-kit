@@ -1,6 +1,6 @@
 import { Icon } from '@/shared/ui/Icon';
 
-import Select from './Select';
+import { Select } from './Select';
 
 import type { Meta, StoryObj } from '@storybook/react';
 
