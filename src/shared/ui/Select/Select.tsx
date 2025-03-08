@@ -1,15 +1,17 @@
 // TODO: Add multiselect checkboxes to option; Remove focus after multiselect is cleared by clicking button
 import cn from 'classnames';
-import { Children, isValidElement, memo, Ref, useCallback, useMemo, useRef, useState } from 'react';
+import { Children, isValidElement, JSX, memo, Ref, useCallback, useMemo, useRef, useState } from 'react';
 import ReactSelect, {
+    ActionMeta,
     ControlProps,
     FormatOptionLabelMeta,
     GroupBase,
     IndicatorsContainerProps,
-    OnChangeValue,
+    MultiValue,
     PropsValue,
     Props as ReactSelectProps,
     SelectInstance,
+    SingleValue,
     ValueContainerProps,
     components
 } from 'react-select';
@@ -20,21 +22,43 @@ import { FieldContainer, VIEWS_WITH_CLOSE_LABEL } from '@/shared/ui/FieldContain
 
 import styles from './Select.module.css';
 
-type OptionType = { label: string; value: number | string };
+type OptionType = { label: React.ReactNode; value: number | string };
 type TSelectReturnValue<T> = T | number | string | null;
 type TFieldContainerProps = React.ComponentProps<typeof FieldContainer>;
 
 type TSelectProps<
-    Option = unknown,
+    Option extends object = OptionType,
     IsMulti extends boolean = false,
+    ValueKey extends string | undefined = 'value',
     Group extends GroupBase<Option> = GroupBase<Option>
 > = Omit<TFieldContainerProps, 'children' | 'isFilled' | 'isFocused'> & // ReactSelect is a children
-    Omit<ReactSelectProps<Option, IsMulti, Group>, keyof TFieldContainerProps | 'value' | 'placeholder'> & {
+    Omit<
+        ReactSelectProps<Option, IsMulti, Group>,
+        keyof TFieldContainerProps | 'value' | 'placeholder' | 'onChange' | 'isMulti'
+    > & {
         value?: IsMulti extends true ? TSelectReturnValue<Option>[] : TSelectReturnValue<Option>;
         ref?: React.RefObject<SelectInstance> | React.RefCallback<SelectInstance>;
         /** Specify to get the value from one of property in Option */
-        valueKey?: string;
+        valueKey?: ValueKey;
+        isMulti?: IsMulti;
+        onChange?: TSelectOnChange<Option, IsMulti, ValueKey>;
+        /** Additional className for options. This can be useful when the portal is used and some styles are inherited from another parent element. */
+        optionClassName?: cn.Argument;
     };
+type TSelectOnChange<
+    Option extends object = OptionType,
+    IsMulti extends boolean = false,
+    ValueKey extends string | undefined = undefined
+> = (
+    newValue: IsMulti extends true
+        ? ValueKey extends string
+            ? TSelectReturnValue<Option>[]
+            : Option[]
+        : ValueKey extends string
+          ? TSelectReturnValue<Option>
+          : Option | null,
+    actionMeta: ActionMeta<Option>
+) => void;
 
 /** *** CUSTOM COMPONENTS **** */
 const ControlComponent = <
@@ -135,7 +159,13 @@ const checkOptionIsGroup = <Option = OptionType,>(option: Option | GroupBase<Opt
     return option && typeof option === 'object' && 'options' in option;
 };
 
-const findSelectedOption = <Option = OptionType, IsMulti extends boolean = false>({
+const checkOptionIsMulti = <Option = OptionType,>(
+    option: MultiValue<Option> | SingleValue<Option>
+): option is MultiValue<Option> => {
+    return Array.isArray(option);
+};
+
+const findSelectedOption = <Option extends object = OptionType, IsMulti extends boolean = false>({
     value,
     valueKey,
     options
@@ -166,23 +196,29 @@ const selectComponents = {
     MultiValue: () => null
 };
 
-const Select = memo(function Select<Option, IsMulti extends boolean>({
+const Select = memo(function Select<
+    Option extends OptionType,
+    IsMulti extends boolean = false,
+    ValueKey extends string | undefined = 'value'
+>({
     ref,
     view,
     className,
+    optionClassName,
     label,
     error,
     disabled,
     suffix,
     prefix,
     value,
-    valueKey = 'value',
+    valueKey = 'value' as ValueKey,
     isSearchable = false,
-    menuIsOpen = false,
     isMulti = false as IsMulti,
     onChange,
+    onBlur,
+    onFocus,
     ...props
-}: TSelectProps<Option, IsMulti>) {
+}: TSelectProps<Option, IsMulti, ValueKey>) {
     const [focused, setFocused] = useState(false);
     const [filled, setFilled] = useState(Boolean(value));
 
@@ -199,7 +235,7 @@ const Select = memo(function Select<Option, IsMulti extends boolean>({
         );
     }, [value, valueKey, props.options]);
 
-    // Calculate width for singleValue and inputs
+    // Calculate width for singleValue and inputs TODO: combine to single state due to first render optimization
     const [controlRefCb, controlRect] = useRect();
     const [indicatorsRefCb, indicatorsRect] = useRect();
     const [fieldContainerRefCb, fieldContainerRect] = useRect();
@@ -223,11 +259,41 @@ const Select = memo(function Select<Option, IsMulti extends boolean>({
     );
     const selectCombinedRef = useCombinedRefs(ref, updateSelectRef);
 
+    type TOnChangeNewValue = Parameters<TSelectOnChange<Option, IsMulti, ValueKey>>[0];
     const handleChange: ReactSelectProps<Option>['onChange'] = (option, meta) => {
         option ? setFilled(isMulti && Array.isArray(option) ? !!option.length : true) : setFilled(false);
-
-        typeof onChange === 'function' && onChange(option as OnChangeValue<Option, IsMulti>, meta);
+        if (typeof onChange === 'function') {
+            checkOptionIsMulti(option) && isMulti
+                ? onChange(
+                      option.map((item: Option) =>
+                          valueKey && valueKey in item ? item[valueKey as keyof Option] : (item as Option)
+                      ) as TOnChangeNewValue,
+                      meta
+                  )
+                : onChange(
+                      (valueKey && option && valueKey in option
+                          ? ((option as Option)?.[valueKey as keyof Option] ?? null)
+                          : option) as TOnChangeNewValue,
+                      meta
+                  );
+        }
     };
+
+    const handleBlur = useCallback<Exclude<ReactSelectProps<Option>['onBlur'], undefined>>(
+        (e) => {
+            setFocused(false);
+            typeof onBlur === 'function' && onBlur(e);
+        },
+        [setFocused, onBlur]
+    );
+
+    const handleFocus = useCallback<Exclude<ReactSelectProps<Option>['onFocus'], undefined>>(
+        (e) => {
+            setFocused(true);
+            typeof onFocus === 'function' && onFocus(e);
+        },
+        [setFocused, onFocus]
+    );
 
     const inputWidth = controlRect.width - indicatorsRect.width;
     const containerPaddingLeftPx = containerPaddingLeft.current;
@@ -251,19 +317,26 @@ const Select = memo(function Select<Option, IsMulti extends boolean>({
                 {...props}
                 ref={selectCombinedRef as Ref<SelectInstance<Option, IsMulti>>}
                 classNames={{
-                    container: () => styles.select,
+                    container: () =>
+                        cn(styles.select, {
+                            [styles.select_clear]: view === 'clear'
+                        }),
                     control: () => cn(styles['select-control']),
                     valueContainer: () =>
                         cn(styles['select-value'], {
                             '!px-0': view === 'clear',
-                            'pb-1 pt-3.5': view && VIEWS_WITH_CLOSE_LABEL.includes(view) // TODO: This is not ideal that select knows about view
+                            'pb-1 pt-3.5': view && VIEWS_WITH_CLOSE_LABEL.includes(view) && label // TODO: This is not ideal that select knows about view
                         }),
                     indicatorsContainer: () => styles['select-indicators-container'],
-                    menu: () => styles['select-menu'],
+                    menu: () =>
+                        cn(styles['select-menu'], {
+                            [styles['select-menu_clear']]: view === 'clear'
+                        }),
                     input: () => styles['select-input-container'],
                     option: (state) =>
                         cn([
                             styles['select-option'],
+                            optionClassName,
                             {
                                 [styles['select-option_selected']]: state.isSelected,
                                 [styles['select-option_focused']]: state.isFocused
@@ -283,6 +356,11 @@ const Select = memo(function Select<Option, IsMulti extends boolean>({
                     }),
                     container: () => ({}),
                     control: () => ({}),
+                    dropdownIndicator: (baseStyles) => ({
+                        ...baseStyles,
+                        width: view === 'clear' ? 14 : undefined
+                    }),
+                    option: () => ({}),
                     valueContainer: () => ({
                         // See details https://github.com/JedWatson/react-select/issues/3995
                         'input[aria-readonly="true"]': {
@@ -302,16 +380,25 @@ const Select = memo(function Select<Option, IsMulti extends boolean>({
                     }),
                     singleValue: (baseStyles) => ({
                         ...baseStyles
+                    }),
+                    menuPortal: (baseStyles) => ({
+                        ...baseStyles,
+                        zIndex: 99
                     })
                 }}
                 unstyled
                 value={selectValue}
-                onBlur={() => setFocused(false)}
+                onBlur={handleBlur}
                 onChange={handleChange}
-                onFocus={() => setFocused(true)}
+                onFocus={handleFocus}
             />
         </FieldContainer>
     );
-});
+}) as <Option extends OptionType, IsMulti extends boolean = false, ValueKey extends string | undefined = 'value'>(
+    props: TSelectProps<Option, IsMulti, ValueKey>
+) => JSX.Element;
+{
+    /* Explicitly casting the memoized component preserves generic type information that would otherwise be erased by React.memo, ensuring proper type inference for props like `onChange` */
+}
 
 export { Select };
