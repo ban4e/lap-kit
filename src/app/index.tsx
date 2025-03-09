@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/shared/ui/Button';
 import { Icon } from '@/shared/ui/Icon';
 import { Input } from '@/shared/ui/Input';
+import { RangeSlider } from '@/shared/ui/RangeSlider';
 import { Select } from '@/shared/ui/Select';
 import { Toggle } from '@/shared/ui/Toggle';
 import { Tooltip } from '@/shared/ui/Tooltip';
@@ -28,7 +29,14 @@ const App = () => {
                 <Input label="Your title here" prefix="kg" view="clear" />
                 <Select isClearable isSearchable label="Your label here" options={options} suffix="kg" />
                 <Select label="Your label here" options={options} suffix="kg" view="filled" />
-                <Select isMulti label="Your label here" options={options} view="filled" />
+                <Select isMulti={true} label="Your label here" options={options} view="filled" />
+                <RangeSlider
+                    connect="lower"
+                    range={{ min: 1300, max: 3250 }}
+                    start={1500}
+                    step={20}
+                    tooltips={[{ to: (val) => Number.parseInt(val.toString(), 10) }]}
+                />
                 <div>
                     <Tooltip autoOpen placement="left">
                         <Tooltip.Trigger />
