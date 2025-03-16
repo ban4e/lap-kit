@@ -1,18 +1,15 @@
 .range-target,
 .range-target * {
     @apply touch-none select-none;
-    -webkit-touch-callout: none;
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-}
-.range-target {
-    @apply relative bg-n-1 rounded before:absolute before:inset-0 before:border before:border-n-2/50 before:rounded-inherit;
 }
 .range-base,
 .range-connects {
-    @apply w-full h-full relative;
-    z-index: 1;
+    @apply w-full h-full relative z-[1];
 }
-/* Wrapper for all connect elements. */
+.range-base {
+    @apply relative bg-n-1 rounded before:absolute before:inset-0 before:border before:border-n-2/50 before:rounded-inherit;
+}
 .range-connects {
     @apply overflow-hidden rounded;
 }
@@ -26,38 +23,31 @@
     @apply bg-primary;
 }
 .range-handle {
-    @apply absolute w-5 h-5 rounded-full bg-white border-2 border-primary;
-    cursor: default;
+    @apply absolute w-5 h-5 rounded-full bg-primary after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:block after:w-2.5 after:h-2.5 after:rounded-full after:bg-white before:absolute before:-inset-1 before:block before:bg-primary/30 before:rounded-full before:transition-all before:scale-0;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
+}
+.range-target:not([aria-disabled]) .range-handle {
+    @apply hover:before:scale-100;
+}
+.range-handle.range-active {
+    @apply before:scale-100;
 }
 .range-tooltip {
     @apply absolute p-1.5 rounded-md bg-primary text-white text-center whitespace-nowrap text-xs font-medium;
 }
-
-.range-vertical .range-tooltip {
-    -webkit-transform: translate(0, -50%);
-    transform: translate(0, -50%);
-    top: 50%;
-    right: 120%;
+.range-touch-area {
+    @apply w-full h-full;
 }
-.range-horizontal .range-origin > .range-tooltip {
-    -webkit-transform: translate(50%, 0);
-    transform: translate(50%, 0);
-    left: auto;
-    bottom: 10px;
-}
-.range-vertical .range-origin > .range-tooltip {
-    -webkit-transform: translate(0, -18px);
-    transform: translate(0, -18px);
-    top: auto;
-    right: 28px;
-}
-
 .range-horizontal {
-    @apply h-1.5;
+    .range-base {
+        @apply h-1.5;
+    }
     .range-handle {
         @apply -top-2.5 -right-2.5 translate-y-[2px];
+    }
+    .range-origin {
+        @apply h-0;
     }
     .range-tooltip {
         @apply left-1/2 bottom-full -translate-x-1/2 -translate-y-2.5 before:absolute before:top-full before:left-1/2 before:block before:border-t-[6px] before:border-l-[6px] before:border-r-[6px] before:border-t-primary before:border-transparent before:-translate-x-1/2;
@@ -66,154 +56,86 @@
 .range-vertical {
     @apply w-1.5;
     .range-handle {
-        @apply -bottom-2.5 -right-2.5;
+        @apply -bottom-2.5 -right-2.5 -translate-x-[2px];
+    }
+    .range-origin {
+        @apply -top-full w-0;
+    }
+    .range-tooltip {
+        @apply top-1/2 right-full -translate-x-2.5 -translate-y-1/2;
     }
 }
+.range-pips {
+    @apply relative text-xs text-n-3;
+    &-horizontal {
+        @apply top-full left-0 w-full pt-2 h-7;
+    }
+    &-vertical {
+        @apply bottom-full left-full h-full pl-2;
+    }
+}
+.range-marker {
+    @apply absolute bg-n-3;
+}
+.range-marker-horizontal {
+    &.range-marker {
+        @apply w-0.5 h-1 -ml-px;
+    }
+    &.range-marker-sub {
+        @apply h-1.5;
+    }
+    &.range-marker-large {
+        @apply h-2;
+    }
+}
+.range-marker-vertical {
+    &.range-marker {
+        @apply w-1 h-0.5 -mt-px;
+    }
+    &.range-marker-sub {
+        @apply w-1.5;
+    }
+    &.range-marker-large {
+        @apply w-2;
+    }
+}
+.range-value {
+    @apply absolute whitespace-nowrap text-center;
+    &-sub {
+        @apply text-n-3/70 text-[10px];
+    }
+}
+.range-value-horizontal {
+    @apply -translate-x-1/2 translate-y-1/2;
+}
+.range-value-vertical {
+    @apply pl-3 -translate-y-1/2;
+}
+.range-rtl .range-value-vertical {
+    @apply translate-y-1/2;
+}
 
-.range-txt-dir-rtl.range-horizontal .range-origin {
-    left: 0;
-    right: auto;
-}
-.range-vertical .range-origin {
-    top: -100%;
-    width: 0;
-}
-.range-horizontal .range-origin {
-    height: 0;
-}
-.range-touch-area {
-    height: 100%;
-    width: 100%;
-}
 .range-state-tap .range-connect,
 .range-state-tap .range-origin {
-    -webkit-transition: transform 0.3s;
-    transition: transform 0.3s;
+    @apply transition-transform;
 }
-.range-state-drag * {
-    cursor: inherit !important;
-}
-.range-txt-dir-rtl.range-horizontal .range-handle {
-    left: -17px;
-    right: auto;
-}
-/* Handles and cursors;
- */
 .range-draggable {
     cursor: ew-resize;
 }
 .range-vertical .range-draggable {
     cursor: ns-resize;
 }
-
-.range-active {
-    box-shadow:
-        inset 0 0 1px #fff,
-        inset 0 1px 7px #ddd,
-        0 3px 6px -3px #bbb;
-}
-/* Disabled state;
- */
-[disabled] .range-connect {
-    background: #b8b8b8;
-}
-[disabled].range-target,
-[disabled].range-handle,
-[disabled] .range-handle {
-    cursor: not-allowed;
-}
-/* Base;
- *
- */
-.range-pips,
-.range-pips * {
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-}
-.range-pips {
-    position: absolute;
-    color: #999;
-}
-/* Values;
- *
- */
-.range-value {
-    position: absolute;
-    white-space: nowrap;
-    text-align: center;
-}
-.range-value-sub {
-    color: #ccc;
-    font-size: 10px;
-}
-/* Markings;
- *
- */
-.range-marker {
-    position: absolute;
-    background: #ccc;
-}
-.range-marker-sub {
-    background: #aaa;
-}
-.range-marker-large {
-    background: #aaa;
-}
-/* Horizontal layout;
- *
- */
-.range-pips-horizontal {
-    padding: 10px 0;
-    height: 80px;
-    top: 100%;
-    left: 0;
-    width: 100%;
-}
-.range-value-horizontal {
-    -webkit-transform: translate(-50%, 50%);
-    transform: translate(-50%, 50%);
-}
-.range-rtl .range-value-horizontal {
-    -webkit-transform: translate(50%, 50%);
-    transform: translate(50%, 50%);
-}
-.range-marker-horizontal.range-marker {
-    margin-left: -1px;
-    width: 2px;
-    height: 5px;
-}
-.range-marker-horizontal.range-marker-sub {
-    height: 10px;
-}
-.range-marker-horizontal.range-marker-large {
-    height: 15px;
-}
-/* Vertical layout;
- *
- */
-.range-pips-vertical {
-    padding: 0 10px;
-    height: 100%;
-    top: 0;
-    left: 100%;
-}
-.range-value-vertical {
-    -webkit-transform: translate(0, -50%);
-    transform: translate(0, -50%);
-    padding-left: 25px;
-}
-.range-rtl .range-value-vertical {
-    -webkit-transform: translate(0, 50%);
-    transform: translate(0, 50%);
-}
-.range-marker-vertical.range-marker {
-    width: 5px;
-    height: 2px;
-    margin-top: -1px;
-}
-.range-marker-vertical.range-marker-sub {
-    width: 10px;
-}
-.range-marker-vertical.range-marker-large {
-    width: 15px;
+[aria-disabled] {
+    &.range-target {
+        @apply cursor-not-allowed;
+    }
+    & .range-connect {
+        @apply bg-n-4;
+    }
+    & .range-handle {
+        @apply cursor-not-allowed bg-n-4;
+    }
+    & .range-tooltip {
+        @apply bg-n-4 before:border-t-n-4;
+    }
 }

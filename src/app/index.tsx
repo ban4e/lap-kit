@@ -14,6 +14,15 @@ const options = [
     { value: 'vanilla', label: 'Vanilla' }
 ];
 
+const range = { min: 1300, max: 3250 };
+const pips = {
+    mode: 'positions' as const,
+    values: [0, 25, 50, 75, 100],
+    density: 5,
+    stepped: true
+};
+const tooltipsRangeSlider = [{ to: (val: number) => Number.parseInt(val.toString(), 10) }];
+
 const App = () => {
     const [count, setCount] = useState(0);
 
@@ -32,10 +41,22 @@ const App = () => {
                 <Select isMulti={true} label="Your label here" options={options} view="filled" />
                 <RangeSlider
                     connect="lower"
-                    range={{ min: 1300, max: 3250 }}
+                    pips={pips}
+                    range={range}
                     start={1500}
                     step={20}
-                    tooltips={[{ to: (val) => Number.parseInt(val.toString(), 10) }]}
+                    tooltips={tooltipsRangeSlider}
+                />
+                <RangeSlider
+                    className="h-36"
+                    connect="lower"
+                    direction="rtl"
+                    orientation="vertical"
+                    pips={pips}
+                    range={range}
+                    start={1500}
+                    step={20}
+                    tooltips={tooltipsRangeSlider}
                 />
                 <div>
                     <Tooltip autoOpen placement="left">
