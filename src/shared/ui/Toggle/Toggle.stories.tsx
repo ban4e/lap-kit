@@ -6,7 +6,7 @@ import type { Meta, StoryObj } from '@storybook/react';
 const meta = { component: Toggle } satisfies Meta<typeof Toggle>;
 export default meta;
 
-export const Overview: StoryObj<typeof Toggle> = {
+export const Default: StoryObj<typeof Toggle> = {
     argTypes: {
         disabled: {
             control: 'boolean'

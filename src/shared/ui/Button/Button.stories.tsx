@@ -11,7 +11,7 @@ const meta: Meta<typeof Button> = {
 };
 
 export default meta;
-export const Overview: StoryObj<typeof Button> = {
+export const Default: StoryObj<typeof Button> = {
     argTypes: {
         theme: {
             options: Object.values(THEMES),

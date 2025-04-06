@@ -28,7 +28,7 @@ const PLACEMENTS = createPlacementsArr([
 const createThemesArr = <T extends readonly Parameters<typeof Tooltip>[0]['theme'][]>(arr: T) => arr;
 const THEMES = createThemesArr(['primary', 'primary-invert']);
 
-export const Overview: StoryObj<typeof Tooltip> = {
+export const Default: StoryObj<typeof Tooltip> = {
     argTypes: {
         children: {
             control: 'text'

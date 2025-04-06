@@ -21,13 +21,19 @@ const mockOptions = [
     { value: 'vanilla', label: 'Vanilla' }
 ];
 
-export const Overview: StoryObj<typeof Select> = {
+const createViewsArr = <T extends readonly Parameters<typeof Select>[0]['view'][]>(arr: T) => arr;
+const VIEWS = createViewsArr(['outlined', 'filled', 'clear']);
+
+export const Default: StoryObj<typeof Select> = {
     argTypes: {
         disabled: {
             control: 'boolean'
         },
         error: {
             control: 'text'
+        },
+        isMulti: {
+            control: 'boolean'
         },
         label: {
             control: 'text'
@@ -47,6 +53,7 @@ export const Overview: StoryObj<typeof Select> = {
             }
         },
         view: {
+            options: VIEWS,
             control: 'select'
         }
     },
@@ -56,13 +63,17 @@ export const Overview: StoryObj<typeof Select> = {
         disabled: false,
         error: '',
         label: 'Very long overflowed label text',
-        view: 'outlined'
+        view: 'outlined',
+        isMulti: false
     },
     parameters: {
-        controls: { include: ['suffix', 'prefix', 'disabled', 'error', 'label', 'view'] }
+        controls: { include: ['suffix', 'prefix', 'disabled', 'isMulti', 'error', 'label', 'view'] }
     },
     render: (args) => (
-        <div className="w-[240px]">
+        <div
+            key={args.view} // force re-render
+            className="w-[240px]"
+        >
             <Select {...args} options={mockOptions} />
         </div>
     )

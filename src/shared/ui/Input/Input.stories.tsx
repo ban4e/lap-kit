@@ -15,7 +15,13 @@ const icons = {
     UserIcon
 };
 
-export const Overview: StoryObj<typeof Input> = {
+const createMasksArr = <T extends readonly Parameters<typeof Input>[0]['mask'][]>(arr: T) => arr;
+const MASKS = createMasksArr(['numeric']);
+
+const createViewsArr = <T extends readonly Parameters<typeof Input>[0]['view'][]>(arr: T) => arr;
+const VIEWS = createViewsArr(['outlined', 'filled', 'clear']);
+
+export const Default: StoryObj<typeof Input> = {
     argTypes: {
         disabled: {
             control: 'boolean'
@@ -27,6 +33,7 @@ export const Overview: StoryObj<typeof Input> = {
             control: 'text'
         },
         mask: {
+            options: MASKS,
             control: 'select'
         },
         prefix: {
@@ -44,6 +51,7 @@ export const Overview: StoryObj<typeof Input> = {
             }
         },
         view: {
+            options: VIEWS,
             control: 'select'
         }
     },

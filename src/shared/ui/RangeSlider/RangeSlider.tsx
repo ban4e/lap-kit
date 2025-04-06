@@ -57,7 +57,7 @@ export const RangeSlider = memo(function RangeSlide({ onChange, className, disab
             );
         }
         // Update options only this deps are changed
-    }, [options.range, options.start, pips]);
+    }, [options.range, options.start, options.step, pips]);
 
     /** Disable */
     useEffect(() => {
