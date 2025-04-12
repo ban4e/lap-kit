@@ -23,7 +23,7 @@ const pips = {
 };
 const tooltipsRangeSlider = [{ to: (val: number) => Number.parseInt(val.toString(), 10) }];
 
-const App = () => {
+export const App = () => {
     const [count, setCount] = useState(0);
 
     return (
@@ -87,5 +87,3 @@ const App = () => {
         </div>
     );
 };
-
-export default App;

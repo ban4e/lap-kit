@@ -11,7 +11,7 @@ function setRef<T>(ref: OptionalRef<T>, value: T) {
     }
 }
 
-export default function useCombinedRefs<T>(...refs: OptionalRef<T>[]) {
+export function useCombinedRefs<T>(...refs: OptionalRef<T>[]) {
     const previousRefs = useRef<OptionalRef<T>[]>([]);
 
     return useCallback((value: T | null) => {

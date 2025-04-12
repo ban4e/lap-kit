@@ -1,12 +1,12 @@
 import { FC, SVGProps } from 'react';
 
-import useDynamicSvgImport from './useDynamicSvgImport';
+import { useDynamicSvgImport } from './useDynamicSvgImport';
 
 interface IIconProps extends SVGProps<SVGSVGElement> {
     name: string;
 }
 
-const Icon: FC<IIconProps> = ({ name, width, height, ...attrs }) => {
+export const Icon: FC<IIconProps> = ({ name, width, height, ...attrs }) => {
     const { error, loading, IconComponent, size } = useDynamicSvgImport(name);
 
     if (error || !IconComponent || !size || loading) {
@@ -34,5 +34,3 @@ const Icon: FC<IIconProps> = ({ name, width, height, ...attrs }) => {
 
     return <IconComponent height={iconSize.height} width={iconSize.width} {...attrs} />;
 };
-
-export default Icon;

@@ -2,8 +2,8 @@ import cn from 'classnames';
 import React from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
-import usePulse from '@/shared/lib/hooks/usePulse';
-import useRect from '@/shared/lib/hooks/useRect';
+import { usePulse } from '@/shared/lib/hooks/usePulse';
+import { useRect } from '@/shared/lib/hooks/useRect';
 import { ValueOf } from '@/shared/lib/types';
 
 import styles from './Button.module.css';
@@ -50,7 +50,7 @@ type IButtonOverload = {
 const isAnchor = (props: IButtonProps | IAnchorProps): props is IAnchorProps => props.tag === 'a';
 
 // NOTE: there is no props destruction because of union type narrowing. See details: https://github.com/microsoft/TypeScript/issues/46680
-const Button: IButtonOverload = (props: IButtonProps | IAnchorProps) => {
+export const Button: IButtonOverload = (props: IButtonProps | IAnchorProps) => {
     // Getting props to set default value
     const withPulse: typeof props.withPulse = 'withPulse' in props ? props.withPulse : true;
 
@@ -148,5 +148,3 @@ const Button: IButtonOverload = (props: IButtonProps | IAnchorProps) => {
         </button>
     );
 };
-
-export default Button;

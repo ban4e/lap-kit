@@ -18,6 +18,13 @@ export default tseslint.config(
         extends: [storybook.configs['flat/recommended']]
     },
     {
+        ignores: ['src/**/*.stories.{js,jsx,mjs,cjs,ts,tsx}', 'src/**/*.test.{js,jsx,mjs,cjs,ts,tsx}'],
+        files: ['src/**/*.{js,jsx,mjs,cjs,ts,tsx}'],
+        rules: {
+            'import-x/no-default-export': 2
+        }
+    },
+    {
         files: ['**/*.{js,jsx,mjs,cjs}'],
         rules: {
             'no-undef': 2 // This rule is enabled for JavaScript files to catch references to undefined variables.

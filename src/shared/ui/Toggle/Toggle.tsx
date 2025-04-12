@@ -10,7 +10,7 @@ interface IToggleProps extends ComponentPropsWithRef<'input'> {
     children?: React.ReactNode;
 }
 
-const ToggleField = forwardRef<HTMLInputElement, IToggleProps>(function Toggle(
+export const Toggle = forwardRef<HTMLInputElement, IToggleProps>(function Toggle(
     { type = 'checkbox', children, error, disabled, className, ...props },
     ref
 ) {
@@ -46,5 +46,3 @@ const ToggleField = forwardRef<HTMLInputElement, IToggleProps>(function Toggle(
         </span>
     );
 });
-
-export default ToggleField;

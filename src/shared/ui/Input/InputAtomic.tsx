@@ -2,7 +2,7 @@ import cn from 'classnames';
 import IMask, { FactoryArg } from 'imask';
 import { useRef, useEffect, forwardRef } from 'react';
 
-import useCombinedRefs from '@/shared/lib/hooks/useCombinedRefs';
+import { useCombinedRefs } from '@/shared/lib/hooks/useCombinedRefs';
 
 enum InputMasks {
     'numeric' = 'numeric'
@@ -12,7 +12,7 @@ interface InputAtomicProps extends React.ComponentPropsWithRef<'input'> {
     mask?: keyof typeof InputMasks;
 }
 
-const InputAtomic = forwardRef<HTMLInputElement, InputAtomicProps>(function InputAtomic(
+export const InputAtomic = forwardRef<HTMLInputElement, InputAtomicProps>(function InputAtomic(
     { mask, type = 'text', className = '', ...props },
     ref
 ) {
@@ -48,5 +48,3 @@ const InputAtomic = forwardRef<HTMLInputElement, InputAtomicProps>(function Inpu
 
     return <input ref={combinedRef} className={cn(className)} type={type} {...props} />;
 });
-
-export default InputAtomic;

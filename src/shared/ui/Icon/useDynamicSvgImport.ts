@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
 
-export default function useDynamicSvgImport(iconName: string) {
+export function useDynamicSvgImport(iconName: string) {
     const importedIconRef = useRef<React.FC<React.SVGProps<SVGElement>>>(null);
     const [size, setSize] = useState<{ width: number; height: number } | null>(null);
     const [loading, setLoading] = useState(false);

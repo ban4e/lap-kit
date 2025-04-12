@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Icon } from '@/shared/ui/Icon';
 
-import Button, { FILLS, THEMES } from './Button';
+import { Button, FILLS, THEMES } from './Button';
 
 import type { Meta, StoryObj } from '@storybook/react';
 

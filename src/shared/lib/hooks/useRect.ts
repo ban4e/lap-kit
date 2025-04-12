@@ -21,7 +21,7 @@ function getRect<T extends HTMLElement>(element?: T): DOMRectReadOnly {
     return rect;
 }
 
-export default function useRect<T extends HTMLElement>(): [RefCallback<T>, DOMRectReadOnly] {
+export function useRect<T extends HTMLElement>(): [RefCallback<T>, DOMRectReadOnly] {
     const [rect, setRect] = useState<DOMRectReadOnly>(getRect());
     const observerRef = useRef<ResizeObserver | null>(null);
     const elementRef = useRef<T | null>(null);

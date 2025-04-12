@@ -2,7 +2,7 @@ import { ChangeEvent, FocusEvent, forwardRef, useState } from 'react';
 
 import { FieldContainer } from '@/shared/ui/FieldContainer';
 
-import InputAtomic from './InputAtomic';
+import { InputAtomic } from './InputAtomic';
 
 // NOTE: using type instead of interface to avoid error from eslint@typescript-eslint/no-empty-object-type
 type FieldContainerProps = React.ComponentPropsWithoutRef<typeof FieldContainer>;
@@ -10,7 +10,7 @@ type InputAtomicProps = React.ComponentPropsWithRef<typeof InputAtomic>;
 
 interface InputProps extends Omit<FieldContainerProps, 'children'>, Omit<InputAtomicProps, keyof FieldContainerProps> {}
 
-const Input = forwardRef<HTMLInputElement, InputProps>(function InputField(
+export const Input = forwardRef<HTMLInputElement, InputProps>(function InputField(
     { view, className, label, error, disabled, suffix, prefix, ...props },
     ref
 ) {
@@ -49,5 +49,3 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function InputField(
         </FieldContainer>
     );
 });
-
-export default Input;

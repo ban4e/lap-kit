@@ -1,7 +1,7 @@
 import cn from 'classnames';
 import React, { useCallback, useRef, useState } from 'react';
 
-import useRect from '@/shared/lib/hooks/useRect';
+import { useRect } from '@/shared/lib/hooks/useRect';
 import { ValueOf } from '@/shared/lib/types';
 
 import styles from './FieldContainer.module.css';
@@ -30,7 +30,7 @@ export interface IFieldContainerProps {
 
 export const VIEWS_WITH_CLOSE_LABEL: ValueOf<typeof FieldView>[] = [FieldView.CLEAR, FieldView.FILLED];
 
-const FieldContainer = ({
+export const FieldContainer = ({
     view = FieldView.OUTLINED,
     label,
     error,
@@ -158,5 +158,3 @@ const FieldContainer = ({
         </div>
     );
 };
-
-export default FieldContainer;

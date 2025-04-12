@@ -1,4 +1,4 @@
-import Toggle from './Toggle';
+import { Toggle } from './Toggle';
 
 import type { Meta, StoryObj } from '@storybook/react';
 

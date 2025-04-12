@@ -16,8 +16,8 @@ import ReactSelect, {
     components
 } from 'react-select';
 
-import useCombinedRefs from '@/shared/lib/hooks/useCombinedRefs';
-import useRect from '@/shared/lib/hooks/useRect';
+import { useCombinedRefs } from '@/shared/lib/hooks/useCombinedRefs';
+import { useRect } from '@/shared/lib/hooks/useRect';
 import { FieldContainer, VIEWS_WITH_CLOSE_LABEL } from '@/shared/ui/FieldContainer';
 
 import styles from './Select.module.css';

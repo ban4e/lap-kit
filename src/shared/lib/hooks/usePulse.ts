@@ -12,7 +12,7 @@ interface IPulseItem {
     nodeRef: React.RefObject<unknown>;
 }
 
-export default function usePulse(rect: DOMRectReadOnly) {
+export function usePulse(rect: DOMRectReadOnly) {
     const [pulseItems, setPulseItems] = useState<Array<IPulseItem>>([]);
     const pulseClick = useCallback(
         (e: React.MouseEvent | React.KeyboardEvent): void => {
