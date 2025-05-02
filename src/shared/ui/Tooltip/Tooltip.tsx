@@ -21,7 +21,7 @@ import {
     DetectOverflowOptions
 } from '@floating-ui/react';
 import cn from 'classnames';
-import { cloneElement, createContext, isValidElement, use, useMemo, useRef, useState } from 'react';
+import { createContext, isValidElement, use, useMemo, useRef, useState } from 'react';
 
 import { ValueOf } from '@/shared/lib/types';
 
@@ -160,22 +160,19 @@ const Tooltip = ({ children, ...options }: { children: React.ReactNode } & Toolt
 
 const TooltipTrigger = ({ children, ref: propRef, ...props }: TriggerOptions) => {
     const context = useTooltipContext();
-    // const children = asChild && 'children' in props && props.children;
-    // children && delete props.children;
     const ref = useMergeRefs([context.refs.setReference, propRef]);
 
-    // `asChild` allows the user to pass any element as the anchor
+    // Use a wrapper element to ensure the ref is correctly applied
     if (children && isValidElement(children)) {
-        const childrenProps = children.props || {};
-
-        return cloneElement(
-            children,
-            context.getReferenceProps({
-                ref,
-                ...props,
-                ...childrenProps,
-                'data-state': context.isOpen ? 'open' : 'closed'
-            })
+        return (
+            <div
+                ref={context.refs.setReference}
+                className="inline-block"
+                data-state={context.isOpen ? 'open' : 'closed'}
+                {...context.getReferenceProps(props)}
+            >
+                {children}
+            </div>
         );
     }
 
