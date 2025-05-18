@@ -26,6 +26,12 @@ export interface IFieldContainerProps {
     rootRef?: React.Ref<HTMLDivElement> | null;
     /** Cancels the default event when the container is clicked for focusing the input. */
     isPreventPointerDownEvent?: boolean;
+    /** Container selector for label width calculations. Default: [data-input-container] or the 'input' itself. Useful for nested/hidden inputs. */
+    inputContainerSelector?: string;
+}
+
+function isHTMLInputElement(target: EventTarget | null): target is HTMLInputElement {
+    return target !== null && (target as HTMLElement).tagName === 'INPUT';
 }
 
 export const VIEWS_WITH_CLOSE_LABEL: ValueOf<typeof FieldView>[] = [FieldView.CLEAR, FieldView.FILLED];
@@ -42,25 +48,28 @@ export const FieldContainer = ({
     suffix,
     prefix,
     rootRef,
-    isPreventPointerDownEvent = true
+    isPreventPointerDownEvent = true,
+    inputContainerSelector = '[data-input-container]'
 }: IFieldContainerProps) => {
-    const inputRef = useRef<HTMLInputElement | null>(null);
-    const [inputRefCallback, inputRect] = useRect();
+    const inputsRef = useRef<HTMLInputElement[] | null>(null); // Container could contain multiple inputs (ex. datepicker)
+    const [wrapperRefCallback, wrapperRect] = useRect(); // Rect of wrapper for input(s)
     const setRef = useCallback(
         (node: HTMLDivElement | null) => {
-            const inputContainerNode: HTMLElement | null = node?.querySelector('[data-input-container]') || null;
-            const inputNode = node?.querySelector('input') || null;
-            inputRefCallback(inputContainerNode || inputNode);
-            inputRef.current = inputNode;
+            const inputContainerNode: HTMLElement | null = node?.querySelector(inputContainerSelector) || null;
+            const inputNodes = node?.querySelectorAll('input') || [];
+            const wrapperNode = inputContainerNode || inputNodes[0] || null;
+            wrapperRefCallback(wrapperNode);
+            inputsRef.current = inputNodes.length ? [...inputNodes] : null;
         },
-        [inputRefCallback]
+        [wrapperRefCallback, inputContainerSelector]
     );
 
     // To avoid jumps (focus/unfocus) when the field is focused and the user clicks inside the field, but outside the input
     const [isKeepFocus, setIsKeepFocus] = useState(false);
     const [delayedIsFocused, setDelayedIsFocused] = useState(false); // To avoid label overflows suffix element in moment of animation start, but it invokes additional render (CSS delay not working)
-    const focusInput = () => {
-        inputRef.current?.addEventListener(
+
+    const focusInput = ({ inputIndex }: { inputIndex: number } = { inputIndex: 0 }) => {
+        inputsRef.current?.[inputIndex]?.addEventListener(
             'blur',
             () => {
                 setIsKeepFocus(false);
@@ -70,7 +79,7 @@ export const FieldContainer = ({
             },
             { once: true }
         );
-        inputRef.current?.focus();
+        inputsRef.current?.[inputIndex]?.focus();
         setIsKeepFocus(true);
         setTimeout(() => {
             setDelayedIsFocused(true);
@@ -78,13 +87,23 @@ export const FieldContainer = ({
     };
 
     const handlePointerDown = (e: React.PointerEvent) => {
-        if (disabled || !inputRef.current) {
+        if (disabled || !inputsRef.current) {
             return;
         }
 
         // To prevent lose focus from input clicking in area of container
-        isPreventPointerDownEvent && e.target !== inputRef.current && e.preventDefault();
-        focusInput();
+        isPreventPointerDownEvent && !isHTMLInputElement(e.target) && e.preventDefault();
+
+        // Focus input on click position detection (for multiple inputs inside wrapper)
+        let inputIndex = 0;
+        if (inputsRef.current.length > 1) {
+            const maxClickPosition = wrapperRect.left + wrapperRect.width;
+            const clickX = Math.min(Math.max(e.clientX, wrapperRect.left), maxClickPosition);
+            const clickPosition = (clickX - wrapperRect.left) / wrapperRect.width;
+            inputIndex = Math.min(Math.floor(clickPosition * inputsRef.current.length), inputsRef.current.length - 1);
+        }
+
+        focusInput({ inputIndex });
     };
 
     // Loose focus on prefix/suffix pointerDown event
@@ -148,7 +167,7 @@ export const FieldContainer = ({
                 {label && (
                     <span
                         className={styles.field__label}
-                        style={{ width: delayedIsFocused || isFilled || prefix ? 'auto' : `${inputRect.width}px` }}
+                        style={{ width: delayedIsFocused || isFilled || prefix ? 'auto' : `${wrapperRect.width}px` }}
                     >
                         {label}
                     </span>

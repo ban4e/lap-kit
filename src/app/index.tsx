@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { Button } from '@/shared/ui/Button';
+import { DatePicker } from '@/shared/ui/Datepicker';
 import { Icon } from '@/shared/ui/Icon';
 import { Input } from '@/shared/ui/Input';
 import { RangeSlider } from '@/shared/ui/RangeSlider';
@@ -25,6 +26,7 @@ const tooltipsRangeSlider = [{ to: (val: number) => Number.parseInt(val.toString
 
 export const App = () => {
     const [count, setCount] = useState(0);
+    const [isDatePickerShow, setIsDatePickerShow] = useState(true);
 
     return (
         <div className="flex min-h-screen flex-col items-center justify-center">
@@ -47,6 +49,7 @@ export const App = () => {
                     step={20}
                     tooltips={tooltipsRangeSlider}
                 />
+                {isDatePickerShow && <DatePicker label="Select dates" placeholder="123" />}
                 <RangeSlider
                     className="h-36"
                     connect="lower"
@@ -59,13 +62,13 @@ export const App = () => {
                     tooltips={tooltipsRangeSlider}
                 />
                 <div>
-                    <Tooltip autoOpen placement="left">
+                    <Tooltip placement="left">
                         <Tooltip.Trigger />
                         <Tooltip.Content>123</Tooltip.Content>
                     </Tooltip>
                 </div>
                 <div>
-                    <Toggle>
+                    <Toggle checked={isDatePickerShow} onChange={() => setIsDatePickerShow((prev) => !prev)}>
                         Checkbox
                         <br /> 2 line
                     </Toggle>
