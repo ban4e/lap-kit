@@ -18,7 +18,8 @@ import {
     arrow,
     FlipOptions,
     HideOptions,
-    DetectOverflowOptions
+    DetectOverflowOptions,
+    UseFloatingOptions
 } from '@floating-ui/react';
 import cn from 'classnames';
 import { createContext, isValidElement, use, useMemo, useRef, useState } from 'react';
@@ -42,6 +43,10 @@ type TriggerUnion = ValueOf<typeof OPEN_TRIGGER>;
 
 type TooltipOptions = {
     autoOpen?: boolean;
+    isOpen?: boolean;
+    onOpenChange?: UseFloatingOptions['onOpenChange'];
+    /** Determines whether the floating element should be unmounted after hiding. If the value is false, the component will be hidden using CSS. */
+    isUnmountOnHide?: boolean;
     boundary?: Boundary;
     /** in ms */
     delay?: number;
@@ -60,6 +65,9 @@ type TriggerOptions = React.HTMLProps<HTMLElement> & {
 
 function useTooltip({
     autoOpen,
+    isOpen: isOpenControlled,
+    onOpenChange: setIsOpenControlled,
+    isUnmountOnHide = true,
     boundary = 'clippingAncestors',
     delay = 0,
     offset: mainAxisOffset = 5,
@@ -70,8 +78,11 @@ function useTooltip({
     trigger = { hover: true, focus: true },
     withArrow = true
 }: TooltipOptions = {}) {
-    const [isOpen, setIsOpen] = useState(autoOpen);
+    const [isOpenUncontrolled, setIsOpenUncontrolled] = useState(autoOpen);
     const arrowRef = useRef(null);
+
+    const isOpen = isOpenControlled ?? isOpenUncontrolled;
+    const setIsOpen = isOpenControlled ? setIsOpenControlled : setIsOpenUncontrolled;
 
     const floatingData = useFloating({
         placement,
@@ -99,7 +110,7 @@ function useTooltip({
                 element: arrowRef
             })
         ],
-        whileElementsMounted: autoUpdate // automatically handles calling and cleaning up autoUpdate based on the presence of the reference and floating element.
+        whileElementsMounted: isOpen ? autoUpdate : undefined // automatically handles calling and cleaning up autoUpdate based on the presence of the reference and floating element.
     });
 
     const hover = useHover(floatingData.context, {
@@ -133,10 +144,11 @@ function useTooltip({
             theme,
             arrowRef,
             withArrow,
+            isUnmountOnHide,
             ...interactions,
             ...floatingData
         }),
-        [isOpen, theme, withArrow, interactions, floatingData]
+        [isOpen, setIsOpen, theme, withArrow, isUnmountOnHide, interactions, floatingData]
     );
 }
 const TooltipContext = createContext<ReturnType<typeof useTooltip> | null>(null);
@@ -194,24 +206,27 @@ const TooltipContent = ({
     style,
     ref: propRef,
     children,
+    className,
     ...props
 }: React.HTMLProps<HTMLDivElement> & { ref?: React.RefObject<HTMLDivElement> }) => {
     const context = useTooltipContext();
     const ref = useMergeRefs([context.refs.setFloating, propRef]);
     const { arrowRef, withArrow } = context;
 
-    if (!context.isOpen) return null;
+    if (!context.isOpen && context.isUnmountOnHide) return null;
 
     return (
         <FloatingPortal>
             <div
                 ref={ref}
+                aria-hidden={!context.isOpen}
                 className={cn([
                     styles.tooltip,
                     {
                         [styles['tooltip_primary']]: context.theme === THEMES.PRIMARY,
                         [styles['tooltip_primary-invert']]: context.theme === THEMES.PRIMARY_INVERT,
-                        hidden: context.middlewareData.hide?.referenceHidden
+                        hidden: context.middlewareData.hide?.referenceHidden,
+                        'pointer-events-none hidden opacity-0': !context.isUnmountOnHide && !context.isOpen
                     }
                 ])}
                 style={{
@@ -230,7 +245,7 @@ const TooltipContent = ({
                         width={8}
                     />
                 )}
-                <div className={styles['tooltip__content']}>{children}</div>
+                <div className={cn([styles['tooltip__content'], className])}>{children}</div>
             </div>
         </FloatingPortal>
     );
