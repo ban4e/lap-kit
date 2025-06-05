@@ -27,6 +27,7 @@ const tooltipsRangeSlider = [{ to: (val: number) => Number.parseInt(val.toString
 export const App = () => {
     const [count, setCount] = useState(0);
     const [isDatePickerShow, setIsDatePickerShow] = useState(true);
+    const [dateVal] = useState(['2025-05-30', '2025-05-31']);
 
     return (
         <div className="flex min-h-screen flex-col items-center justify-center">
@@ -49,7 +50,7 @@ export const App = () => {
                     step={20}
                     tooltips={tooltipsRangeSlider}
                 />
-                {isDatePickerShow && <DatePicker label="Select dates" placeholder="123" />}
+                {isDatePickerShow && <DatePicker isRange label="Select dates" placeholder="123" value={dateVal} />}
                 <RangeSlider
                     className="h-36"
                     connect="lower"
