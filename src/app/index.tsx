@@ -50,7 +50,9 @@ export const App = () => {
                     step={20}
                     tooltips={tooltipsRangeSlider}
                 />
-                {isDatePickerShow && <DatePicker isRange label="Select dates" placeholder="123" value={dateVal} />}
+                {isDatePickerShow && (
+                    <DatePicker format="DD/MM/YYYY" isRange label="Select dates" placeholder="123" value={dateVal} />
+                )}
                 <RangeSlider
                     className="h-36"
                     connect="lower"

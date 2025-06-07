@@ -1,5 +1,5 @@
 import { UseFloatingOptions } from '@floating-ui/react';
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import { Calendar, FormatDateString, type Options } from 'vanilla-calendar-pro';
 import 'vanilla-calendar-pro/styles/index.css';
 
@@ -22,6 +22,8 @@ type TProps<IsRange extends boolean = false> = Omit<FieldContainerProps, 'childr
         onChange?: (newValue: IsRange extends true ? TRangeValue : TSingleValue) => void;
         placeholder?: string | [string, string]; // TODO: replace with condition based on IsRange
         ref?: React.RefObject<Calendar> | React.RefCallback<Calendar>;
+        /** Date format. See https://day.js.org/docs/en/display/format */
+        format?: string;
     };
 type TOnChangeParams<IsRange extends boolean = false> = Parameters<Exclude<TProps<IsRange>['onChange'], undefined>>[0];
 
@@ -77,6 +79,35 @@ const normalizeRangeDates = (values: TRangeValue) => {
     return [start || '', end || ''];
 };
 
+/**
+ * Compares two arrays of dates and returns whether they are equal.
+ * @param {TDatePickerValue[]} a - The first array of dates to compare.
+ * @param {TDatePickerValue[]} b - The second array of dates to compare.
+ * @returns {boolean} true if the dates are equal, false otherwise.
+ */
+const compareDateValues = (a: TDatePickerValue[], b: TDatePickerValue[]) => {
+    const isEqual = a.every((value, index) => {
+        if (!value && !b[index]) {
+            return true;
+        }
+
+        return new Date(value).getTime() === new Date(b[index]).getTime();
+    });
+
+    return isEqual;
+};
+
+/** async load dayjs for formatting */
+let dayjs: typeof import('dayjs');
+const loadDayjs = async (): Promise<typeof import('dayjs')> => {
+    if (!dayjs) {
+        const { default: dayjsImport } = await import('dayjs');
+        dayjs = dayjsImport;
+    }
+
+    return dayjs;
+};
+
 export const DatePicker = <IsRange extends boolean = false>({
     view,
     className,
@@ -88,6 +119,7 @@ export const DatePicker = <IsRange extends boolean = false>({
     isRange = false as IsRange,
     placeholder,
     value,
+    format,
     onFocus,
     onBlur,
     onChange,
@@ -95,11 +127,20 @@ export const DatePicker = <IsRange extends boolean = false>({
 }: TProps<IsRange>) => {
     // Values
     const [inputValue, setInputValue] = useState<TDatePickerValue[]>(sanitizeValue({ isRange, value }));
+    const updateInputValue = (value: TDatePickerValue[]) => {
+        let resultValue = value;
+
+        if (dayjs && format) {
+            resultValue = resultValue.map((date) => (date ? dayjs(date).format(format) : ''));
+        }
+
+        setInputValue(resultValue);
+    };
 
     // Calendar instance
     const [calendar, setCalendar] = useState<Calendar | null>(null);
-    const calendarElRef = useRef<HTMLDivElement | null>(null);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+    const calendarElRef = useRef<HTMLDivElement | null>(null);
     const initializedRef = useRef(false); // use additional ref because setCalendar is asynchronous and for strict mode executes twice in refCallback
 
     // Inputs
@@ -111,6 +152,13 @@ export const DatePicker = <IsRange extends boolean = false>({
     const setInputRef = (index: number) => (el: HTMLInputElement | null) => {
         inputRefs.current[index] = el;
     };
+
+    /** Async load date format lib if prop "format" is provided */
+    useEffect(() => {
+        if (format && format !== 'YYYY-MM-DD') {
+            loadDayjs(); // TODO: should inputValue be updated here?
+        }
+    }, [format]);
 
     /** Focuses the next input in the input array */
     const focusNextInput = () => {
@@ -139,7 +187,7 @@ export const DatePicker = <IsRange extends boolean = false>({
             setFilled(false);
             calendar?.set({ selectedDates: [] });
 
-            // Trigger onChange
+            // Trigger onChange TODO: check if values are really changes
             typeof onChange === 'function' &&
                 onChange((isRange ? emptyValue : emptyValue[0]) as TOnChangeParams<IsRange>);
         } else {
@@ -147,8 +195,7 @@ export const DatePicker = <IsRange extends boolean = false>({
             setFilled(true);
 
             // Only update input if dates don't match current input values
-            const datesChanged = !calendarDates.every((value, index) => value === inputValue[index]);
-            datesChanged && setInputValue(calendarDates);
+            !compareDateValues(calendarDates, inputValue) && updateInputValue(calendarDates);
 
             // Trigger onChange
             typeof onChange === 'function' &&
@@ -197,7 +244,7 @@ export const DatePicker = <IsRange extends boolean = false>({
                         result = ['', selectedDates[0] || ''];
                     }
 
-                    setInputValue(() => result);
+                    updateInputValue(result);
 
                     if (result.every((x) => x)) {
                         // Close calendar if all dates are selected
@@ -208,6 +255,7 @@ export const DatePicker = <IsRange extends boolean = false>({
                     }
                 }
             };
+
             const calendarInst = new Calendar(node, calendarOptions);
             setCalendar(calendarInst);
             calendarInst.init();
@@ -350,4 +398,3 @@ export const DatePicker = <IsRange extends boolean = false>({
         </Tooltip>
     );
 };
-// as <IsRange extends boolean>(p: TProps<IsRange> & { ref?: React.Ref<HTMLInputElement> }) => React.ReactElement;
