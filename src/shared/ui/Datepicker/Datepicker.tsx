@@ -1,18 +1,31 @@
 import { UseFloatingOptions } from '@floating-ui/react';
 import { useRef, useState, useCallback, useEffect } from 'react';
-import { Calendar, FormatDateString, type Options } from 'vanilla-calendar-pro';
-import 'vanilla-calendar-pro/styles/index.css';
+import { Calendar, type Options } from 'vanilla-calendar-pro';
 
+import 'vanilla-calendar-pro/styles/index.css';
 import { FieldContainer } from '@/shared/ui/FieldContainer';
 import { InputAtomic } from '@/shared/ui/Input';
 import { Tooltip } from '@/shared/ui/Tooltip';
 
+import { DEFAULT_FORMAT } from './Datepicker.constants';
+import {
+    type TRangeValue,
+    type TSingleValue,
+    type TDatePickerValue,
+    sanitizeValue,
+    TShadowValue,
+    separateDateAndTime,
+    formatDates,
+    loadDayjs,
+    findNextFocusIndex,
+    compareDateValues,
+    convertTimeToMs,
+    normalizeRangeDates,
+    checkDateIsCorrect
+} from './Datepicker.utils';
+
 type FieldContainerProps = React.ComponentPropsWithoutRef<typeof FieldContainer>;
 type InputProps = React.ComponentPropsWithRef<'input'>;
-
-type TDatePickerValue = string;
-type TRangeValue = TDatePickerValue[];
-type TSingleValue = TDatePickerValue;
 
 type TProps<IsRange extends boolean = false> = Omit<FieldContainerProps, 'children'> &
     Omit<InputProps, keyof FieldContainerProps | 'type' | 'onChange' | 'value' | 'placeholder'> & {
@@ -24,89 +37,9 @@ type TProps<IsRange extends boolean = false> = Omit<FieldContainerProps, 'childr
         ref?: React.RefObject<Calendar> | React.RefCallback<Calendar>;
         /** Date format. See https://day.js.org/docs/en/display/format */
         format?: string;
+        withTime?: boolean;
     };
 type TOnChangeParams<IsRange extends boolean = false> = Parameters<Exclude<TProps<IsRange>['onChange'], undefined>>[0];
-
-/**
- * Sanitizes the value for calendar usage.
- * - For range mode (isRange=true): Ensures value is [string, string] (defaults to ['', ''] if invalid)
- * - For single mode (isRange=false): Ensures value is [string] (defaults to [''] if invalid)
- * @param {object} props
- * @prop {boolean} props.isRange - Whether the value should be interpreted as a range of dates or a single date.
- * @prop {TRangeValue | TSingleValue} [props.value] - The value to be sanitized.
- * @returns {TDatePickerValue[]} The sanitized value.
- */
-const sanitizeValue = ({
-    isRange,
-    value
-}: {
-    isRange: boolean;
-    value?: TRangeValue | TSingleValue;
-}): TDatePickerValue[] => {
-    let result = isRange ? ['', ''] : [''];
-    if (value && isRange) {
-        result = Array.isArray(value) ? [value?.[0] || '', value?.[1] || ''] : [value || '', ''];
-    } else if (!isRange && typeof value === 'string') {
-        result = [value || ''];
-    }
-
-    return result;
-};
-
-/**
- * Finds the index of the input to focus for a range datepicker.
- * @param {number} currentIndex The current index of the focused element.
- * @returns {number} The index of the other element to focus.
- */
-const findNextFocusIndex = (currentIndex: number) => {
-    return currentIndex === 0 ? 1 : 0;
-};
-
-/**
- * Normalize a range of dates by swapping them if the start date is later than the end date.
- * @param {TRangeValue} values - The range of dates to be normalized.
- * @returns {TRangeValue} The normalized range of dates.
- */
-const normalizeRangeDates = (values: TRangeValue) => {
-    const [start, end] = values;
-    const startTimestamp = new Date(start).getTime();
-    const endTimestamp = new Date(end).getTime();
-
-    if (startTimestamp > endTimestamp) {
-        return [end || '', start || ''];
-    }
-
-    return [start || '', end || ''];
-};
-
-/**
- * Compares two arrays of dates and returns whether they are equal.
- * @param {TDatePickerValue[]} a - The first array of dates to compare.
- * @param {TDatePickerValue[]} b - The second array of dates to compare.
- * @returns {boolean} true if the dates are equal, false otherwise.
- */
-const compareDateValues = (a: TDatePickerValue[], b: TDatePickerValue[]) => {
-    const isEqual = a.every((value, index) => {
-        if (!value && !b[index]) {
-            return true;
-        }
-
-        return new Date(value).getTime() === new Date(b[index]).getTime();
-    });
-
-    return isEqual;
-};
-
-/** async load dayjs for formatting */
-let dayjs: typeof import('dayjs');
-const loadDayjs = async (): Promise<typeof import('dayjs')> => {
-    if (!dayjs) {
-        const { default: dayjsImport } = await import('dayjs');
-        dayjs = dayjsImport;
-    }
-
-    return dayjs;
-};
 
 export const DatePicker = <IsRange extends boolean = false>({
     view,
@@ -120,28 +53,69 @@ export const DatePicker = <IsRange extends boolean = false>({
     placeholder,
     value,
     format,
+    withTime,
     onFocus,
     onBlur,
     onChange,
     ...props
 }: TProps<IsRange>) => {
-    // Values
-    const [inputValue, setInputValue] = useState<TDatePickerValue[]>(sanitizeValue({ isRange, value }));
-    const updateInputValue = (value: TDatePickerValue[]) => {
-        let resultValue = value;
-
-        if (dayjs && format) {
-            resultValue = resultValue.map((date) => (date ? dayjs(date).format(format) : ''));
-        }
-
-        setInputValue(resultValue);
-    };
-
     // Calendar instance
     const [calendar, setCalendar] = useState<Calendar | null>(null);
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
     const calendarElRef = useRef<HTMLDivElement | null>(null);
+    const calendarContainerRef = useRef<HTMLDivElement | null>(null);
     const initializedRef = useRef(false); // use additional ref because setCalendar is asynchronous and for strict mode executes twice in refCallback
+    const isTimeChanged = useRef(false); // flag to check if time was changed using calendar controls for preventing invoke method "set" of the calendar
+
+    // Values
+    const [inputValue, setInputValue] = useState<TDatePickerValue[]>(sanitizeValue({ isRange, value }));
+    // Store timestamps of last valid selected datetimes for comparison
+    const shadowValue = useRef<TShadowValue[]>(
+        inputValue.map((date) => separateDateAndTime({ value: date, withTime }))
+    );
+    const updateShadowValue = ({ index, date, time }: { index: number; date?: number; time?: number }) => {
+        if (shadowValue.current[index]) {
+            const updatedValue: Partial<TShadowValue> = { dateInMs: date || 0, timeInMs: time || 0 };
+
+            date === undefined && delete updatedValue.dateInMs;
+            time === undefined && delete updatedValue.timeInMs;
+
+            shadowValue.current[index] = {
+                ...shadowValue.current[index],
+                ...updatedValue
+            };
+        }
+    };
+
+    const updateInputValue = () => {
+        setInputValue(formatDates({ value: shadowValue.current, format }));
+    };
+    /** Update dates in calendar on input change */
+    useEffect(() => {
+        const isCorrectDates = inputValue.every((date) => checkDateIsCorrect({ value: date, format }));
+
+        if (isCorrectDates && !isTimeChanged.current) {
+            calendar?.set(
+                {
+                    selectedDates: normalizeRangeDates(
+                        formatDates({
+                            value: inputValue,
+                            format: DEFAULT_FORMAT
+                        })
+                    )
+                },
+                // update only dates in calendar
+                {
+                    year: false,
+                    month: false,
+                    dates: true,
+                    time: false
+                }
+            );
+        }
+
+        isTimeChanged.current = false;
+    }, [calendar, inputValue, format]);
 
     // Inputs
     const [focused, setFocused] = useState(false);
@@ -155,10 +129,14 @@ export const DatePicker = <IsRange extends boolean = false>({
 
     /** Async load date format lib if prop "format" is provided */
     useEffect(() => {
-        if (format && format !== 'YYYY-MM-DD') {
-            loadDayjs(); // TODO: should inputValue be updated here?
+        if (format && format !== DEFAULT_FORMAT) {
+            // TODO: should inputValue be updated here?
+            (async () => {
+                await loadDayjs();
+                shadowValue.current = inputValue.map((date) => separateDateAndTime({ value: date, withTime }));
+            })();
         }
-    }, [format]);
+    }, [format, withTime]);
 
     /** Focuses the next input in the input array */
     const focusNextInput = () => {
@@ -195,7 +173,9 @@ export const DatePicker = <IsRange extends boolean = false>({
             setFilled(true);
 
             // Only update input if dates don't match current input values
-            !compareDateValues(calendarDates, inputValue) && updateInputValue(calendarDates);
+            shadowValue.current = normalizeRangeDates(shadowValue.current);
+            const shadowValueConverted = shadowValue.current.map((x) => x.dateInMs + x.timeInMs);
+            !compareDateValues(shadowValueConverted, inputValue) && updateInputValue();
 
             // Trigger onChange
             typeof onChange === 'function' &&
@@ -223,28 +203,38 @@ export const DatePicker = <IsRange extends boolean = false>({
 
         if (node && !calendar) {
             const calendarOptions: Options = {
-                type: isRange ? 'multiple' : 'default',
-                displayMonthsCount: isRange ? 2 : 1,
+                type: isRange && !withTime ? 'multiple' : 'default',
+                displayMonthsCount: isRange && !withTime ? 2 : 1,
                 monthsToSwitch: 1,
                 selectedDates: inputValue,
                 selectionDatesMode: isRange ? 'multiple-ranged' : 'single',
                 enableDateToggle: false,
+                selectionTimeMode: withTime ? 24 : false,
                 onClickDate(self) {
                     const { selectedDates } = self.context;
-                    if (!selectedDates) {
-                        return;
-                    }
+                    const inputIndex = focusedInputIdx.current || 0;
 
                     let result: string[] = isRange
                         ? [selectedDates[0] || '', selectedDates[1] || '']
                         : [selectedDates[0] || ''];
 
                     // special case for range when the second input is focused
-                    if (isRange && focusedInputIdx.current === 1 && selectedDates.length === 1) {
+                    if (isRange && inputIndex === 1 && selectedDates.length === 1) {
                         result = ['', selectedDates[0] || ''];
                     }
 
-                    updateInputValue(result);
+                    updateShadowValue({
+                        index: inputIndex,
+                        date: result[inputIndex]
+                            ? separateDateAndTime({ value: result[inputIndex], withTime }).dateInMs
+                            : 0
+                    });
+                    updateInputValue();
+
+                    // Use manual controls for a range datetime picker
+                    if (isRange && withTime) {
+                        return;
+                    }
 
                     if (result.every((x) => x)) {
                         // Close calendar if all dates are selected
@@ -253,6 +243,17 @@ export const DatePicker = <IsRange extends boolean = false>({
                         // Focus next input
                         focusNextInput();
                     }
+                },
+                onChangeTime(self) {
+                    const { selectedTime } = self.context;
+                    const inputIndex = focusedInputIdx.current || 0;
+                    isTimeChanged.current = true;
+
+                    updateShadowValue({
+                        index: inputIndex,
+                        time: convertTimeToMs(selectedTime)
+                    });
+                    updateInputValue();
                 }
             };
 
@@ -282,7 +283,7 @@ export const DatePicker = <IsRange extends boolean = false>({
             setTimeout(() => {
                 const activeEl = document.activeElement;
                 const isFocusStillInside =
-                    inputContainerRef.current?.contains(activeEl) || calendarElRef.current?.contains(activeEl);
+                    inputContainerRef.current?.contains(activeEl) || calendarContainerRef.current?.contains(activeEl);
 
                 if (!isFocusStillInside) {
                     handleCalendarClose({ calendarCtx: calendar.context });
@@ -308,13 +309,6 @@ export const DatePicker = <IsRange extends boolean = false>({
         }
 
         const { value } = e.target;
-        const isCorrectDate = value?.length === 10 && !isNaN(new Date(value)?.getTime()); // TODO: replace condition with format option and date time library support
-        if (isCorrectDate) {
-            const calendarDates = [...(calendar?.context.selectedDates || [])];
-            calendarDates[inputIndex] = value as FormatDateString;
-            calendar?.set({ selectedDates: normalizeRangeDates(calendarDates) });
-        }
-
         setInputValue((prev) => {
             const newValue = [...prev];
             newValue[inputIndex] = value;
@@ -392,8 +386,28 @@ export const DatePicker = <IsRange extends boolean = false>({
                     </div>
                 </FieldContainer>
             </Tooltip.Trigger>
-            <Tooltip.Content className="rounded-md border p-0">
+            <Tooltip.Content ref={calendarContainerRef} className="rounded-md border p-0">
                 <div ref={calendarElRefCallback} />
+                {isCalendarOpen && isRange && withTime && (
+                    <div className="relative -mt-2 flex justify-end px-4 pb-4">
+                        <button
+                            className="mr-2 rounded bg-primary px-2.5 py-1 text-white"
+                            type="button"
+                            onClick={focusNextInput}
+                        >
+                            Next
+                        </button>
+                        <button
+                            className="rounded bg-primary px-2.5 py-1 text-white"
+                            type="button"
+                            onClick={() => {
+                                calendar && handleCalendarClose({ calendarCtx: calendar.context });
+                            }}
+                        >
+                            Done
+                        </button>
+                    </div>
+                )}
             </Tooltip.Content>
         </Tooltip>
     );

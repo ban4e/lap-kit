@@ -60,7 +60,7 @@ type TooltipOptions = {
 };
 type TriggerOptions = React.HTMLProps<HTMLElement> & {
     children?: React.ReactNode | never;
-    ref?: React.RefObject<HTMLElement | null> | ((node: HTMLElement) => void);
+    ref?: React.Ref<HTMLElement | null>;
 };
 
 function useTooltip({
@@ -208,7 +208,7 @@ const TooltipContent = ({
     children,
     className,
     ...props
-}: React.HTMLProps<HTMLDivElement> & { ref?: React.RefObject<HTMLDivElement> }) => {
+}: React.HTMLProps<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> }) => {
     const context = useTooltipContext();
     const ref = useMergeRefs([context.refs.setFloating, propRef]);
     const { arrowRef, withArrow } = context;

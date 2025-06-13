@@ -51,7 +51,14 @@ export const App = () => {
                     tooltips={tooltipsRangeSlider}
                 />
                 {isDatePickerShow && (
-                    <DatePicker format="DD/MM/YYYY" isRange label="Select dates" placeholder="123" value={dateVal} />
+                    <DatePicker
+                        format="YYYY-MM-DD HH:mm:ss"
+                        isRange
+                        label="Select dates"
+                        placeholder="123"
+                        value={dateVal}
+                        withTime
+                    />
                 )}
                 <RangeSlider
                     className="h-36"
