@@ -107,6 +107,21 @@ export const convertTimeToMs = (timeString: string): number => {
     return (hours * 3600 + minutes * 60) * 1000;
 };
 
+/**
+ * Converts milliseconds to HH:mm time format
+ * @param ms Duration in milliseconds (e.g., 9000000 for "02:30")
+ * @returns Time string in HH:mm format (e.g., "02:30")
+ */
+export const convertMsToTime = (ms: number): string => {
+    if (ms <= 0) return '00:00';
+
+    const totalSeconds = Math.floor(ms / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+    return `0${hours}`.slice(-2) + ':' + `0${minutes}`.slice(-2);
+};
+
 export const separateDateAndTime = ({
     value,
     withTime = false
@@ -119,7 +134,7 @@ export const separateDateAndTime = ({
             return { dateInMs: value ? new Date(value).getTime() : 0, timeInMs: 0 };
         }
 
-        const date = dayjs(value);
+        let date = dayjs(value);
 
         // Get time in milliseconds
         const hours = date.get('hour');
@@ -127,7 +142,7 @@ export const separateDateAndTime = ({
         const timeInMs = (hours * 3600 + minutes * 60) * 1000;
 
         // Get date with zero time in milliseconds
-        date.set('hour', 0).set('minute', 0).set('second', 0);
+        date = date.hour(0).minute(0).second(0);
         const dateInMs = date.unix() * 1000;
 
         return { dateInMs, timeInMs };

@@ -21,7 +21,8 @@ import {
     compareDateValues,
     convertTimeToMs,
     normalizeRangeDates,
-    checkDateIsCorrect
+    checkDateIsCorrect,
+    convertMsToTime
 } from './Datepicker.utils';
 
 type FieldContainerProps = React.ComponentPropsWithoutRef<typeof FieldContainer>;
@@ -33,7 +34,7 @@ type TProps<IsRange extends boolean = false> = Omit<FieldContainerProps, 'childr
         isRange?: IsRange;
         value?: IsRange extends true ? TRangeValue : TSingleValue;
         onChange?: (newValue: IsRange extends true ? TRangeValue : TSingleValue) => void;
-        placeholder?: string | [string, string]; // TODO: replace with condition based on IsRange
+        placeholder?: IsRange extends true ? string | [string, string] : string;
         ref?: React.RefObject<Calendar> | React.RefCallback<Calendar>;
         /** Date format. See https://day.js.org/docs/en/display/format */
         format?: string;
@@ -70,9 +71,11 @@ export const DatePicker = <IsRange extends boolean = false>({
     // Values
     const [inputValue, setInputValue] = useState<TDatePickerValue[]>(sanitizeValue({ isRange, value }));
     // Store timestamps of last valid selected datetimes for comparison
-    const shadowValue = useRef<TShadowValue[]>(
-        inputValue.map((date) => separateDateAndTime({ value: date, withTime }))
-    );
+    const shadowValue = useRef<TShadowValue[]>([]);
+    if (!shadowValue.current.length) {
+        shadowValue.current = inputValue.map((date) => separateDateAndTime({ value: date, withTime }));
+    }
+
     const updateShadowValue = ({ index, date, time }: { index: number; date?: number; time?: number }) => {
         if (shadowValue.current[index]) {
             const updatedValue: Partial<TShadowValue> = { dateInMs: date || 0, timeInMs: time || 0 };
@@ -165,9 +168,10 @@ export const DatePicker = <IsRange extends boolean = false>({
             setFilled(false);
             calendar?.set({ selectedDates: [] });
 
-            // Trigger onChange TODO: check if values are really changes
-            typeof onChange === 'function' &&
+            // Trigger onChange only if value is changed
+            if (typeof onChange === 'function' && !compareDateValues(emptyValue, sanitizeValue({ isRange, value }))) {
                 onChange((isRange ? emptyValue : emptyValue[0]) as TOnChangeParams<IsRange>);
+            }
         } else {
             // Case 2: All dates are properly selected - update state
             setFilled(true);
@@ -177,94 +181,104 @@ export const DatePicker = <IsRange extends boolean = false>({
             const shadowValueConverted = shadowValue.current.map((x) => x.dateInMs + x.timeInMs);
             !compareDateValues(shadowValueConverted, inputValue) && updateInputValue();
 
-            // Trigger onChange
-            typeof onChange === 'function' &&
-                onChange((isRange ? calendarDates : calendarDates[0]) as TOnChangeParams<IsRange>);
+            // Trigger onChange only if value is changed
+            if (
+                typeof onChange === 'function' &&
+                !compareDateValues(shadowValueConverted, sanitizeValue({ isRange, value }))
+            ) {
+                const result = formatDates({ value: shadowValue.current, format });
+                onChange((isRange ? result : result[0]) as TOnChangeParams<IsRange>);
+            }
         }
     };
 
-    // TODO: optimize
-    const calendarElRefCallback = useCallback((node: HTMLDivElement | null) => {
-        calendarElRef.current = node;
+    // TODO: could be optimized?
+    const calendarElRefCallback = useCallback(
+        (node: HTMLDivElement | null) => {
+            calendarElRef.current = node;
 
-        // cleanup calendar instance
-        if (!node && calendar) {
-            calendar.destroy();
-            setCalendar(null);
-            initializedRef.current = false;
+            // cleanup calendar instance
+            if (!node && calendar) {
+                calendar.destroy();
+                setCalendar(null);
+                initializedRef.current = false;
 
-            return;
-        }
+                return;
+            }
 
-        // nothing to do if it has already been initialized
-        if (initializedRef.current) {
-            return;
-        }
+            // nothing to do if it has already been initialized
+            if (initializedRef.current && calendar) {
+                return;
+            }
 
-        if (node && !calendar) {
-            const calendarOptions: Options = {
-                type: isRange && !withTime ? 'multiple' : 'default',
-                displayMonthsCount: isRange && !withTime ? 2 : 1,
-                monthsToSwitch: 1,
-                selectedDates: inputValue,
-                selectionDatesMode: isRange ? 'multiple-ranged' : 'single',
-                enableDateToggle: false,
-                selectionTimeMode: withTime ? 24 : false,
-                onClickDate(self) {
-                    const { selectedDates } = self.context;
-                    const inputIndex = focusedInputIdx.current || 0;
+            if (node && !calendar) {
+                const calendarOptions: Options = {
+                    type: isRange && !withTime ? 'multiple' : 'default',
+                    displayMonthsCount: isRange && !withTime ? 2 : 1,
+                    monthsToSwitch: 1,
+                    selectedDates: formatDates({
+                        value: inputValue
+                    }),
+                    selectionDatesMode: isRange ? 'multiple-ranged' : 'single',
+                    enableDateToggle: false,
+                    selectionTimeMode: withTime ? 24 : false,
+                    // WARNING: This callback captures state values from the render scope (snapshot) when created
+                    onClickDate(self) {
+                        const { selectedDates } = self.context;
+                        const inputIndex = focusedInputIdx.current || 0;
 
-                    let result: string[] = isRange
-                        ? [selectedDates[0] || '', selectedDates[1] || '']
-                        : [selectedDates[0] || ''];
+                        let result: string[] = isRange
+                            ? [selectedDates[0] || '', selectedDates[1] || '']
+                            : [selectedDates[0] || ''];
 
-                    // special case for range when the second input is focused
-                    if (isRange && inputIndex === 1 && selectedDates.length === 1) {
-                        result = ['', selectedDates[0] || ''];
+                        // special case for range when the second input is focused
+                        if (isRange && inputIndex === 1 && selectedDates.length === 1) {
+                            result = ['', selectedDates[0] || ''];
+                        }
+
+                        updateShadowValue({
+                            index: inputIndex,
+                            date: result[inputIndex]
+                                ? separateDateAndTime({ value: result[inputIndex], withTime }).dateInMs
+                                : 0
+                        });
+                        updateInputValue();
+
+                        // Use manual controls for a range datetime picker
+                        if (isRange && withTime) {
+                            return;
+                        }
+
+                        if (result.every((x) => x)) {
+                            // Close calendar if all dates are selected
+                            handleCalendarClose({ calendarCtx: self.context });
+                        } else {
+                            // Focus next input
+                            focusNextInput();
+                        }
+                    },
+                    // WARNING: This callback captures state values from the render scope (snapshot) when created
+                    onChangeTime(self) {
+                        const { selectedTime } = self.context;
+                        const inputIndex = focusedInputIdx.current || 0;
+                        isTimeChanged.current = true;
+
+                        updateShadowValue({
+                            index: inputIndex,
+                            time: convertTimeToMs(selectedTime)
+                        });
+                        updateInputValue();
                     }
+                };
 
-                    updateShadowValue({
-                        index: inputIndex,
-                        date: result[inputIndex]
-                            ? separateDateAndTime({ value: result[inputIndex], withTime }).dateInMs
-                            : 0
-                    });
-                    updateInputValue();
-
-                    // Use manual controls for a range datetime picker
-                    if (isRange && withTime) {
-                        return;
-                    }
-
-                    if (result.every((x) => x)) {
-                        // Close calendar if all dates are selected
-                        handleCalendarClose({ calendarCtx: self.context });
-                    } else {
-                        // Focus next input
-                        focusNextInput();
-                    }
-                },
-                onChangeTime(self) {
-                    const { selectedTime } = self.context;
-                    const inputIndex = focusedInputIdx.current || 0;
-                    isTimeChanged.current = true;
-
-                    updateShadowValue({
-                        index: inputIndex,
-                        time: convertTimeToMs(selectedTime)
-                    });
-                    updateInputValue();
-                }
-            };
-
-            const calendarInst = new Calendar(node, calendarOptions);
-            setCalendar(calendarInst);
-            calendarInst.init();
-            initializedRef.current = true;
-        }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+                const calendarInst = new Calendar(node, calendarOptions);
+                setCalendar(calendarInst);
+                calendarInst.init();
+                initializedRef.current = true;
+            }
+        },
+        [calendar]
+    );
 
     // Focus / blur
     const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -272,10 +286,27 @@ export const DatePicker = <IsRange extends boolean = false>({
         setFocused(true);
         focusedInputIdx.current = Number(e.target.dataset.inputIndex);
         onFocus?.(e);
+
+        // Set actual time in calendar
+        if (withTime) {
+            const focusedTime = shadowValue.current[focusedInputIdx.current]?.timeInMs || 0;
+
+            calendar?.set(
+                { selectedTime: convertMsToTime(focusedTime) },
+                // update only time in calendar
+                {
+                    year: false,
+                    month: false,
+                    dates: false,
+                    time: true
+                }
+            );
+        }
     };
     const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
         setFocused(false);
-        calendar?.context.selectedDates.some((item) => item) ? setFilled(true) : setFilled(false); // TODO: maybe change condition to check inputs value. NOTE: there is enough to check only one value is filled
+        // There is enough to check only one value is filled
+        shadowValue.current.some((item) => item) ? setFilled(true) : setFilled(false);
         onBlur?.(e);
 
         // Check if focus moved to another elem inside the DatePicker
@@ -309,6 +340,16 @@ export const DatePicker = <IsRange extends boolean = false>({
         }
 
         const { value } = e.target;
+
+        if (checkDateIsCorrect({ value, format })) {
+            const { dateInMs, timeInMs } = separateDateAndTime({ value, withTime });
+
+            updateShadowValue({
+                index: inputIndex,
+                date: dateInMs,
+                time: timeInMs
+            });
+        }
         setInputValue((prev) => {
             const newValue = [...prev];
             newValue[inputIndex] = value;
