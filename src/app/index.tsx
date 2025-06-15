@@ -55,7 +55,7 @@ export const App = () => {
                         format="YYYY-MM-DD HH:mm:ss"
                         isRange
                         label="Select dates"
-                        placeholder={['Start date', '']}
+                        placeholder={['Start date', 'End date']}
                         value={dateVal}
                         withTime
                         onChange={(date) => {

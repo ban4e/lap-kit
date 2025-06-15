@@ -1,9 +1,11 @@
 import { UseFloatingOptions } from '@floating-ui/react';
+import cn from 'classnames';
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { Calendar, type Options } from 'vanilla-calendar-pro';
 
 import 'vanilla-calendar-pro/styles/index.css';
 import { FieldContainer } from '@/shared/ui/FieldContainer';
+import { Icon } from '@/shared/ui/Icon';
 import { InputAtomic } from '@/shared/ui/Input';
 import { Tooltip } from '@/shared/ui/Tooltip';
 
@@ -93,6 +95,23 @@ export const DatePicker = <IsRange extends boolean = false>({
     const updateInputValue = () => {
         setInputValue(formatDates({ value: shadowValue.current, format }));
     };
+    const clearValue = () => {
+        const emptyShadowValue = separateDateAndTime({ value: '' });
+        const emptyValue = isRange ? ['', ''] : [''];
+        shadowValue.current = isRange ? [emptyShadowValue, emptyShadowValue] : [emptyShadowValue];
+        setInputValue(emptyValue);
+        calendar?.set({ selectedDates: [] });
+
+        // Trigger onChange only if value is changed
+        if (typeof onChange === 'function' && !compareDateValues(emptyValue, sanitizeValue({ isRange, value }))) {
+            onChange((isRange ? emptyValue : emptyValue[0]) as TOnChangeParams<IsRange>);
+        }
+    };
+    const handleClearPointerDown = (e: React.MouseEvent) => {
+        e.stopPropagation(); // stop focus on input
+        clearValue();
+    };
+
     /** Update dates in calendar on input change */
     useEffect(() => {
         const isCorrectDates = inputValue.every((date) => checkDateIsCorrect({ value: date, format }));
@@ -379,7 +398,7 @@ export const DatePicker = <IsRange extends boolean = false>({
         >
             <Tooltip.Trigger>
                 <FieldContainer
-                    className={className}
+                    className={cn(['group', className])}
                     disabled={disabled}
                     error={error}
                     inputContainerSelector="[data-input-container]"
@@ -391,7 +410,7 @@ export const DatePicker = <IsRange extends boolean = false>({
                     suffix={suffix}
                     view={view}
                 >
-                    <div className="flex h-full w-full" data-input-container="true">
+                    <div className="flex h-full w-full items-center" data-input-container="true">
                         <InputAtomic
                             {...props}
                             ref={setInputRef(0)}
@@ -411,19 +430,33 @@ export const DatePicker = <IsRange extends boolean = false>({
                             onKeyDown={handleKeyDown}
                         />
                         {isRange && (
-                            <InputAtomic
-                                {...props}
-                                ref={setInputRef(1)}
-                                data-input-index={1}
-                                disabled={disabled}
-                                placeholder={placeholder?.[1]}
-                                value={inputValue[1]}
-                                onBlur={handleBlur}
-                                onChange={handleInputChange}
-                                onFocus={handleFocus}
-                                onKeyDown={handleKeyDown}
-                            />
+                            <>
+                                <div className="mx-2 inline-flex items-center">
+                                    <Icon className="fill-gray-300" name="arrow-right" width={16} />
+                                </div>
+                                <InputAtomic
+                                    {...props}
+                                    ref={setInputRef(1)}
+                                    data-input-index={1}
+                                    disabled={disabled}
+                                    placeholder={placeholder?.[1]}
+                                    value={inputValue[1]}
+                                    onBlur={handleBlur}
+                                    onChange={handleInputChange}
+                                    onFocus={handleFocus}
+                                    onKeyDown={handleKeyDown}
+                                />
+                            </>
                         )}
+                        <div className="relative z-[1] inline-flex w-4 flex-shrink-0 cursor-pointer items-center justify-center">
+                            <Icon className="fill-gray-300 group-hover:hidden" name="calendar" width={16} />
+                            <Icon
+                                className="hidden fill-gray-300 hover:fill-gray-400 group-hover:block"
+                                name="cross"
+                                width={12}
+                                onPointerDown={handleClearPointerDown}
+                            />
+                        </div>
                     </div>
                 </FieldContainer>
             </Tooltip.Trigger>
