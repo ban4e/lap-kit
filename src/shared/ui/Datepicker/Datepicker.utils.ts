@@ -134,16 +134,16 @@ export const separateDateAndTime = ({
             return { dateInMs: value ? new Date(value).getTime() : 0, timeInMs: 0 };
         }
 
-        let date = dayjs(value);
+        let date = dayjs(value); // could return NaN for empty value
 
         // Get time in milliseconds
-        const hours = date.get('hour');
-        const minutes = date.get('minute');
+        const hours = date.get('hour') || 0;
+        const minutes = date.get('minute') || 0;
         const timeInMs = (hours * 3600 + minutes * 60) * 1000;
 
         // Get date with zero time in milliseconds
         date = date.hour(0).minute(0).second(0);
-        const dateInMs = date.unix() * 1000;
+        const dateInMs = date.unix() * 1000 || 0;
 
         return { dateInMs, timeInMs };
     } catch (error) {
@@ -196,4 +196,11 @@ export const checkDateIsCorrect = ({ value, format }: { value: string; format?: 
     }
 
     return value?.length === 10 && !isNaN(new Date(value)?.getTime());
+};
+
+export const preventReset = {
+    year: false,
+    month: false,
+    dates: false,
+    time: false
 };
