@@ -62,17 +62,16 @@ export const findNextFocusIndex = (currentIndex: number) => {
  * @returns {TRangeValue | TShadowValue[]} The normalized range of dates.
  */
 export const normalizeRangeDates = <T extends TRangeValue | TShadowValue[]>(values: T): T => {
-    const [start, end] = values;
-    const startTimestamp =
-        typeof start === 'string' ? new Date(start).getTime() : new Date(start.dateInMs + start.timeInMs).getTime();
-    const endTimestamp =
-        typeof end === 'string' ? new Date(end).getTime() : new Date(end.dateInMs + end.timeInMs).getTime();
-
-    if (startTimestamp > endTimestamp) {
-        return [end, start] as T;
+    if (values.length === 1) {
+        return values;
     }
 
-    return [start, end] as T;
+    return values.sort((a, b) => {
+        const aTimestamp = typeof a === 'string' ? new Date(a).getTime() : new Date(a.dateInMs + a.timeInMs).getTime();
+        const bTimestamp = typeof b === 'string' ? new Date(b).getTime() : new Date(b.dateInMs + b.timeInMs).getTime();
+
+        return aTimestamp - bTimestamp;
+    }) as T;
 };
 
 /**

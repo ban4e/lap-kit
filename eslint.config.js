@@ -18,7 +18,11 @@ export default tseslint.config(
         extends: [storybook.configs['flat/recommended']]
     },
     {
-        ignores: ['src/**/*.stories.{js,jsx,mjs,cjs,ts,tsx}', 'src/**/*.test.{js,jsx,mjs,cjs,ts,tsx}'],
+        ignores: [
+            'src/**/*.stories.{js,jsx,mjs,cjs,ts,tsx}',
+            'src/**/*.test.{js,jsx,mjs,cjs,ts,tsx}',
+            'src/__mocks__/**/*.{js,jsx,mjs,cjs,ts,tsx}'
+        ],
         files: ['src/**/*.{js,jsx,mjs,cjs,ts,tsx}'],
         rules: {
             'import-x/no-default-export': 2
@@ -75,7 +79,6 @@ export default tseslint.config(
             globals: {
                 ...globals.browser,
                 ...globals.node,
-                ...globals.jest,
                 ...globals.builtin,
                 React: 'writable'
             }

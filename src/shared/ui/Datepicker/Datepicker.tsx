@@ -109,7 +109,7 @@ export const DatePicker = <IsRange extends boolean = false>({
             onChange((isRange ? emptyValue : emptyValue[0]) as TOnChangeParams<IsRange>);
         }
     };
-    const handleClearPointerDown = (e: React.MouseEvent) => {
+    const handleClearClick = (e: React.MouseEvent) => {
         e.stopPropagation(); // stop focus on input
         clearValue();
     };
@@ -487,17 +487,23 @@ export const DatePicker = <IsRange extends boolean = false>({
                         )}
                         <div className="relative z-[1] inline-flex w-4 flex-shrink-0 cursor-pointer items-center justify-center">
                             <Icon className="fill-gray-300 group-hover:hidden" name="calendar" width={16} />
-                            <Icon
-                                className="hidden fill-gray-300 hover:fill-gray-400 group-hover:block"
-                                name="cross"
-                                width={12}
-                                onPointerDown={handleClearPointerDown}
-                            />
+                            <button
+                                aria-label="clear"
+                                className="hidden group-hover:inline-flex"
+                                type="button"
+                                onClick={handleClearClick}
+                            >
+                                <Icon className="fill-gray-300 hover:fill-gray-400" name="cross" width={12} />
+                            </button>
                         </div>
                     </div>
                 </FieldContainer>
             </Tooltip.Trigger>
-            <Tooltip.Content ref={calendarContainerRef} className="rounded-md border p-0">
+            <Tooltip.Content
+                ref={calendarContainerRef}
+                className="rounded-md border p-0"
+                data-testid="datepicker-popup"
+            >
                 <div ref={calendarElRefCallback}>
                     <div></div>
                 </div>

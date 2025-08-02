@@ -7,22 +7,22 @@ interface IIconProps extends SVGProps<SVGSVGElement> {
 }
 
 export const Icon: FC<IIconProps> = ({ name, width, height, ...attrs }) => {
-    const { error, loading, IconComponent, size } = useDynamicSvgImport(name);
+    const { error, iconInfo } = useDynamicSvgImport(name);
 
-    if (error || !IconComponent || !size || loading) {
+    if (error || !iconInfo) {
         return null;
     }
 
     const iconSize = (() => {
-        let resultWidth: number = size.width;
-        let resultHeight: number = size.height;
+        let resultWidth: number = iconInfo.width;
+        let resultHeight: number = iconInfo.height;
         const propWidth = Number(width);
         const propHeight = Number(height);
         if (propWidth && !propHeight) {
             resultWidth = propWidth;
-            resultHeight = (size.height * propWidth) / size.width;
+            resultHeight = (iconInfo.height * propWidth) / iconInfo.width;
         } else if (!propWidth && propHeight) {
-            resultWidth = (size.width * propHeight) / size.height;
+            resultWidth = (iconInfo.width * propHeight) / iconInfo.height;
             resultHeight = propHeight;
         } else if (propWidth && propHeight) {
             resultWidth = propWidth;
@@ -31,6 +31,8 @@ export const Icon: FC<IIconProps> = ({ name, width, height, ...attrs }) => {
 
         return { width: resultWidth, height: resultHeight };
     })();
+
+    const IconComponent = iconInfo.component;
 
     return <IconComponent height={iconSize.height} width={iconSize.width} {...attrs} />;
 };

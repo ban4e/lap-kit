@@ -12,8 +12,8 @@
         "esModuleInterop": true,
         "types": [
             "vite/client",
-            "jest",
-            "@testing-library/jest-dom",
+            "vitest/globals",
+            "@testing-library/jest-dom/vitest",
             "node",
             "react",
             "react-dom"

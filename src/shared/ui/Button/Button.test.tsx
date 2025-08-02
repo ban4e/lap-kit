@@ -6,11 +6,11 @@ describe('Button component', () => {
     const btnText = 'Button text';
     const defaultProps: React.ComponentProps<typeof Button> = {
         children: btnText,
-        onClick: jest.fn()
+        onClick: vi.fn()
     };
 
     afterEach(() => {
-        jest.clearAllMocks(); // clear onClick mock
+        vi.clearAllMocks(); // clear onClick mock
     });
 
     test('Renders button with provided text', () => {
