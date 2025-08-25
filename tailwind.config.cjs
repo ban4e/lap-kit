@@ -1,3 +1,5 @@
+import palette from './palette.json';
+
 /** @type {import('tailwindcss').Config} */
 export default {
     darkMode: ['class', '[data-mode="dark"]'],
@@ -6,16 +8,7 @@ export default {
         extend: {
             colors: {
                 // Using modern `rgb`
-                background: 'rgb(var(--color-background) / <alpha-value>)',
-                foreground: 'rgb(var(--color-foreground) / <alpha-value>)',
-                primary: 'rgb(var(--color-primary) / <alpha-value>)',
-                'primary-foreground': 'rgb(var(--color-primary-foreground) / <alpha-value>)',
-                secondary: 'rgb(var(--color-secondary) / <alpha-value>)',
-                'secondary-foreground': 'rgb(var(--color-secondary-foreground) / <alpha-value>)',
-                third: 'rgb(var(--color-third) / <alpha-value>)',
-                'third-foreground': 'rgb(var(--color-third-foreground) / <alpha-value>)',
-                success: 'rgb(var(--color-success) / <alpha-value>)',
-                danger: 'rgb(var(--color-danger) / <alpha-value>)',
+                ...palette,
                 'n-1': 'rgb(var(--color-n-1) / <alpha-value>)',
                 'n-2': 'rgb(var(--color-n-2) / <alpha-value>)',
                 'n-3': 'rgb(var(--color-n-3) / <alpha-value>)',

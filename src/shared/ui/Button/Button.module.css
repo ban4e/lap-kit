@@ -1,83 +1,96 @@
 .button {
-    @apply relative inline-flex h-10 cursor-pointer items-center justify-center overflow-hidden rounded-lg px-2 font-medium outline-none after:absolute after:-inset-px after:block after:rounded-inherit after:border-4 after:opacity-0 after:transition-none focus-visible:after:opacity-100 focus-visible:after:transition active:after:opacity-0 enabled:transition;
+    @apply relative inline-flex h-10 items-center justify-center overflow-hidden rounded-lg px-2 font-medium outline-none after:absolute after:-inset-px after:block after:rounded-inherit after:border-4 after:opacity-0 after:transition-none focus-visible:after:opacity-100 focus-visible:after:transition active:after:opacity-0;
     &__content {
         @apply relative flex items-center;
     }
 }
+.button:not(.is-disabled) {
+    @apply cursor-pointer transition;
+}
 
-/* PREDEFINED */
+.is-disabled {
+    @apply cursor-not-allowed text-foreground/50;
+    &.button_outline {
+        @apply bg-accent border-accent;
+    }
+    &.button_solid {
+        @apply bg-accent;
+    }
+    a&.button {
+        @apply pointer-events-none;
+    }
+}
+
+/* FILLS */
 .button_solid {
-    @apply border-none enabled:hover:shadow-lg;
-    &.is-disabled {
-        @apply !bg-foreground/40;
+    @apply border-none;
+    &:not(.is-disabled) {
+        @apply hover:shadow-lg;
     }
 }
 .button_outline {
-    @apply border-2 enabled:hover:shadow-lg;
-    &.is-disabled {
-        @apply !border-foreground/40;
+    @apply border-2;
+    &:not(.is-disabled) {
+        @apply hover:shadow-lg;
     }
 }
-.button_text {
-    @apply enabled:hover:opacity-80;
-}
-.is-disabled {
-    @apply !cursor-not-allowed !text-foreground/50;
+.button_text:not(.is-disabled) {
+    @apply hover:opacity-80;
 }
 
 /* PRIMARY */
-.button_theme_primary.button_solid {
+.button_theme_primary.button_solid:not(.is-disabled) {
     @apply bg-primary text-primary-foreground after:border-primary-foreground/50;
 }
-.button_theme_primary.button_outline {
-    @apply border-primary text-primary;
+.button_theme_primary.button_outline:not(.is-disabled) {
+    @apply border-primary text-primary after:border-secondary;
 }
-.button_theme_primary.button_text {
-    @apply text-primary;
+.button_theme_primary.button_text:not(.is-disabled) {
+    @apply text-primary after:border-primary;
 }
 
 /* SECONDARY */
-.button_theme_secondary.button_solid {
-    @apply bg-secondary text-secondary-foreground;
+.button_theme_secondary.button_solid:not(.is-disabled) {
+    @apply bg-secondary text-secondary-foreground after:border-secondary-foreground/50;
 }
-.button_theme_secondary.button_outline {
-    @apply border-secondary text-secondary-foreground;
+.button_theme_secondary.button_outline:not(.is-disabled) {
+    @apply border-secondary text-secondary-foreground after:border-secondary;
 }
-.button_theme_secondary.button_text {
-    @apply text-secondary-foreground;
+.button_theme_secondary.button_text:not(.is-disabled) {
+    @apply text-secondary-foreground after:border-secondary-foreground;
 }
 
-/* THIRD */
-.button_theme_third.button_solid {
-    @apply bg-third text-third-foreground;
+/* ACCENT */
+.button_theme_accent.button_solid:not(.is-disabled) {
+    @apply bg-accent text-accent-foreground after:border-accent-foreground;
 }
-.button_theme_third.button_outline {
-    @apply text-third-foreground border-third;
+.button_theme_accent.button_outline:not(.is-disabled) {
+    @apply text-accent-foreground border-accent after:border-accent;
 }
-.button_theme_third.button_text {
-    @apply text-third-foreground;
+.button_theme_accent.button_text:not(.is-disabled)   {
+    @apply text-accent-foreground after:border-accent-foreground;
 }
 
 /* SUCCESS */
-.button_theme_success.button_solid {
-    @apply bg-success dark:text-foreground text-background;
+.button_theme_success.button_solid:not(.is-disabled) {
+    @apply bg-success text-background dark:text-foreground;
 }
-.button_theme_success.button_outline {
-    @apply text-success border-success;
+.button_theme_success.button_outline:not(.is-disabled) {
+    @apply text-success border-success after:border-success;
 }
-.button_theme_success.button_text {
-    @apply text-success;
+.button_theme_success.button_text:not(.is-disabled) {
+    @apply text-success after:border-success;
 }
 
 /* DANGER */
-.button_theme_danger.button_solid {
+.button_theme_danger.button_solid:not(.is-disabled) {
     @apply bg-danger dark:text-foreground text-background;
 }
-.button_theme_danger.button_outline {
-    @apply text-danger border-danger;
+.button_theme_danger.button_outline:not(.is-disabled) {
+    @apply text-danger border-danger after:border-danger;
 }
-.button_theme_danger.button_text {
-    @apply text-danger;
+.button_theme_danger.button_text:not(.is-disabled) {
+    @apply text-danger after:border-danger;
 }
 
 /* PULSE ANIMATION */

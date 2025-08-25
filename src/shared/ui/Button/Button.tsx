@@ -1,17 +1,18 @@
-import cn from 'classnames';
+import { cva } from 'class-variance-authority';
 import React from 'react';
 import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import { usePulse } from '@/shared/lib/hooks/usePulse';
 import { useRect } from '@/shared/lib/hooks/useRect';
 import { ValueOf } from '@/shared/lib/types';
+import { cn } from '@/shared/lib/utils';
 
 import styles from './Button.module.css';
 
 export const THEMES = {
     PRIMARY: 'primary',
     SECONDARY: 'secondary',
-    THIRD: 'third',
+    ACCENT: 'accent',
     SUCCESS: 'success',
     DANGER: 'danger'
 } as const;
@@ -49,6 +50,31 @@ type IButtonOverload = {
 
 const isAnchor = (props: IButtonProps | IAnchorProps): props is IAnchorProps => props.tag === 'a';
 
+// NOTE: Using CSS modules here provides benefits like minification and hashing, but adds complexity and make impossible to use `twMerge`. Alternatively, using Tailwind classes directly would add flexibility for variant management and enable twMerge, but sacrifice CSS modules benefits.
+const buttonVariants = cva(styles.button, {
+    variants: {
+        theme: {
+            [THEMES.PRIMARY]: styles.button_theme_primary,
+            [THEMES.SECONDARY]: styles.button_theme_secondary,
+            [THEMES.ACCENT]: styles.button_theme_accent,
+            [THEMES.SUCCESS]: styles.button_theme_success,
+            [THEMES.DANGER]: styles.button_theme_danger
+        },
+        fill: {
+            [FILLS.SOLID]: styles.button_solid,
+            [FILLS.OUTLINE]: styles.button_outline,
+            [FILLS.TEXT]: styles.button_text
+        },
+        isDisabled: {
+            true: styles['is-disabled']
+        }
+    },
+    defaultVariants: {
+        theme: THEMES.PRIMARY,
+        fill: FILLS.SOLID
+    }
+});
+
 // NOTE: there is no props destruction because of union type narrowing. See details: https://github.com/microsoft/TypeScript/issues/46680
 export const Button: IButtonOverload = (props: IButtonProps | IAnchorProps) => {
     // Getting props to set default value
@@ -75,15 +101,12 @@ export const Button: IButtonOverload = (props: IButtonProps | IAnchorProps) => {
     };
 
     /* Classes */
-    const btnFill = props.fill || FILLS.SOLID;
-    const btnTheme = props.theme || THEMES.PRIMARY;
-
-    const themeClass = styles[`button_theme_${btnTheme}`];
-    const fillClass = styles[`button_${btnFill}`];
-    const rootClass = cn(styles.button, themeClass, fillClass, {
-        'is-loading': props.isLoading,
-        [styles['is-disabled']]: props.disabled
+    const rootClass = buttonVariants({
+        theme: props.theme || THEMES.PRIMARY,
+        fill: props.fill || FILLS.SOLID,
+        isDisabled: props.disabled
     });
+
     const content = (
         <>
             {/* TODO: loading indicator */}
@@ -122,7 +145,7 @@ export const Button: IButtonOverload = (props: IButtonProps | IAnchorProps) => {
     );
 
     if (isAnchor(props)) {
-        const { className, children, theme, fill, isLoading, ...attrs } = props; // NOTE: typings works correctly only if destruction are made inside branch
+        const { className, children, theme, fill, isLoading, tag, ...attrs } = props; // NOTE: typings works correctly only if destruction are made inside branch
 
         return (
             <a
@@ -140,7 +163,7 @@ export const Button: IButtonOverload = (props: IButtonProps | IAnchorProps) => {
     }
 
     // button render
-    const { className, children, theme, fill, isLoading, ...attrs } = props;
+    const { className, children, theme, fill, isLoading, tag, ...attrs } = props;
 
     return (
         <button ref={buttonRefCallback} {...attrs} className={cn(rootClass, className)} onClick={handleClick}>
