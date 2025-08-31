@@ -1,8 +1,12 @@
 .tooltip {
-    @apply text-xs rounded-md z-50;
+    @apply z-50;
     &__content {
         @apply p-1.5;
     }
+}
+
+.tooltip_main {
+    @apply text-xs rounded-md;
 }
 
 /* PRIMARY */

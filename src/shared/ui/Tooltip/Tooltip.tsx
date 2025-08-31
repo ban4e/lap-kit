@@ -21,10 +21,10 @@ import {
     DetectOverflowOptions,
     UseFloatingOptions
 } from '@floating-ui/react';
-import cn from 'classnames';
 import { cloneElement, createContext, isValidElement, use, useMemo, useRef, useState } from 'react';
 
 import { ValueOf } from '@/shared/lib/types';
+import { cn } from '@/shared/lib/utils';
 
 import styles from './Tooltip.module.css';
 
@@ -221,10 +221,43 @@ const TooltipContent = ({
     ref: propRef,
     children,
     className,
+    isPlain = false,
     ...props
-}: React.HTMLProps<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> }) => {
+}: React.HTMLProps<HTMLDivElement> & {
+    ref?: React.Ref<HTMLDivElement>;
+    /** Render just basic class styles and without arrow */ isPlain?: boolean;
+}) => {
     const context = useTooltipContext();
     const ref = useMergeRefs([context.refs.setFloating, propRef]);
+
+    if (isPlain) {
+        return (
+            <FloatingPortal>
+                <div
+                    ref={ref}
+                    aria-hidden={!context.isOpen}
+                    {...context.getFloatingProps(props)}
+                    className={cn([
+                        styles.tooltip,
+                        {
+                            [styles['tooltip_primary']]: context.theme === THEMES.PRIMARY,
+                            [styles['tooltip_primary-invert']]: context.theme === THEMES.PRIMARY_INVERT,
+                            hidden: context.middlewareData.hide?.referenceHidden,
+                            'pointer-events-none hidden opacity-0': !context.isUnmountOnHide && !context.isOpen
+                        },
+                        className
+                    ])}
+                    style={{
+                        ...context.floatingStyles,
+                        ...style
+                    }}
+                >
+                    {children}
+                </div>
+            </FloatingPortal>
+        );
+    }
+
     const { arrowRef, withArrow } = context;
 
     if (!context.isOpen && context.isUnmountOnHide) return null;
@@ -236,12 +269,14 @@ const TooltipContent = ({
                 aria-hidden={!context.isOpen}
                 className={cn([
                     styles.tooltip,
+                    styles['tooltip_main'],
                     {
                         [styles['tooltip_primary']]: context.theme === THEMES.PRIMARY,
                         [styles['tooltip_primary-invert']]: context.theme === THEMES.PRIMARY_INVERT,
                         hidden: context.middlewareData.hide?.referenceHidden,
                         'pointer-events-none hidden opacity-0': !context.isUnmountOnHide && !context.isOpen
-                    }
+                    },
+                    className
                 ])}
                 style={{
                     ...context.floatingStyles,
