@@ -22,7 +22,7 @@ import {
     UseFloatingOptions
 } from '@floating-ui/react';
 import cn from 'classnames';
-import { createContext, isValidElement, use, useMemo, useRef, useState } from 'react';
+import { cloneElement, createContext, isValidElement, use, useMemo, useRef, useState } from 'react';
 
 import { ValueOf } from '@/shared/lib/types';
 
@@ -61,6 +61,7 @@ type TooltipOptions = {
 type TriggerOptions = React.HTMLProps<HTMLElement> & {
     children?: React.ReactNode | never;
     ref?: React.Ref<HTMLElement | null>;
+    asChild?: boolean;
 };
 
 function useTooltip({
@@ -170,15 +171,28 @@ const Tooltip = ({ children, ...options }: { children: React.ReactNode } & Toolt
     return <TooltipContext value={tooltip}>{children}</TooltipContext>;
 };
 
-const TooltipTrigger = ({ children, ref: propRef, ...props }: TriggerOptions) => {
+const TooltipTrigger = ({ children, ref: propRef, asChild = false, ...props }: TriggerOptions) => {
     const context = useTooltipContext();
     const ref = useMergeRefs([context.refs.setReference, propRef]);
 
+    if (asChild && isValidElement(children)) {
+        return cloneElement(
+            children,
+            context.getReferenceProps({
+                ref,
+                ...props,
+                'data-state': context.isOpen ? 'open' : 'closed',
+                ...(children.props || {}),
+                ...context.getReferenceProps(props)
+            })
+        );
+    }
+
     // Use a wrapper element to ensure the ref is correctly applied
-    if (children && isValidElement(children)) {
+    else if (children && isValidElement(children)) {
         return (
             <div
-                ref={context.refs.setReference}
+                ref={ref}
                 className="inline-block"
                 data-state={context.isOpen ? 'open' : 'closed'}
                 {...context.getReferenceProps(props)}
