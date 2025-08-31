@@ -31,7 +31,7 @@ type TSelectProps<
     IsMulti extends boolean = false,
     ValueKey extends string | undefined = 'value',
     Group extends GroupBase<Option> = GroupBase<Option>
-> = Omit<TFieldContainerProps, 'children' | 'isFilled' | 'isFocused'> & // ReactSelect is a children
+> = Omit<TFieldContainerProps, 'children' | 'isFilled' | 'isFocused' | 'ref'> & // ReactSelect is a children
     Omit<
         ReactSelectProps<Option, IsMulti, Group>,
         keyof TFieldContainerProps | 'value' | 'placeholder' | 'onChange' | 'isMulti'
@@ -301,6 +301,7 @@ const Select = memo(function Select<
 
     return (
         <FieldContainer
+            ref={fieldContainerRefCb}
             className={className}
             disabled={disabled}
             error={error}
@@ -309,7 +310,6 @@ const Select = memo(function Select<
             isPreventPointerDownEvent={false}
             label={label}
             prefix={prefix}
-            rootRef={fieldContainerRefCb}
             suffix={suffix}
             view={view}
         >

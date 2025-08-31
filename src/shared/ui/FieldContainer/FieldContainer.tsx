@@ -23,7 +23,7 @@ export interface IFieldContainerProps {
     children: React.ReactNode;
     suffix?: React.ReactNode;
     prefix?: React.ReactNode;
-    rootRef?: React.Ref<HTMLDivElement> | null;
+    ref?: React.Ref<HTMLDivElement> | null;
     /** Cancels the default event when the container is clicked for focusing the input. */
     isPreventPointerDownEvent?: boolean;
     /** Container selector for label width calculations. Default: [data-input-container] or the 'input' itself. Useful for nested/hidden inputs. */
@@ -47,7 +47,7 @@ export const FieldContainer = ({
     children,
     suffix,
     prefix,
-    rootRef,
+    ref,
     isPreventPointerDownEvent = true,
     inputContainerSelector = '[data-input-container]'
 }: IFieldContainerProps) => {
@@ -117,7 +117,7 @@ export const FieldContainer = ({
 
     return (
         <div
-            ref={rootRef}
+            ref={ref}
             className={cn(styles.field, className, {
                 [styles['is-focused']]: isFocused || isKeepFocus,
                 [styles['is-filled']]: isFilled || prefix,
