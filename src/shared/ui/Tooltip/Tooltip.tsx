@@ -225,7 +225,8 @@ const TooltipContent = ({
     ...props
 }: React.HTMLProps<HTMLDivElement> & {
     ref?: React.Ref<HTMLDivElement>;
-    /** Render just basic class styles and without arrow */ isPlain?: boolean;
+    /** Render just basic class styles and without arrow */
+    isPlain?: boolean;
 }) => {
     const context = useTooltipContext();
     const ref = useMergeRefs([context.refs.setFloating, propRef]);

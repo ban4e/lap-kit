@@ -1,15 +1,16 @@
 import { UseFloatingOptions } from '@floating-ui/react';
-import cn from 'classnames';
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { Calendar, DatesArr, type Options } from 'vanilla-calendar-pro';
 
-import 'vanilla-calendar-pro/styles/index.css';
+import { ValueOf } from '@/shared/lib/types';
+import { cn } from '@/shared/lib/utils';
 import { FieldContainer } from '@/shared/ui/FieldContainer';
 import { Icon } from '@/shared/ui/Icon';
 import { InputAtomic } from '@/shared/ui/Input';
 import { Tooltip } from '@/shared/ui/Tooltip';
 
-import { DEFAULT_FORMAT } from './Datepicker.constants';
+import { CALENDAR_MENU, DEFAULT_FORMAT } from './Datepicker.constants';
+import styles from './Datepicker.module.css';
 import {
     type TRangeValue,
     type TSingleValue,
@@ -45,6 +46,31 @@ type TProps<IsRange extends boolean = false> = Omit<FieldContainerProps, 'childr
     };
 type TOnChangeParams<IsRange extends boolean = false> = Parameters<Exclude<TProps<IsRange>['onChange'], undefined>>[0];
 
+const calendarStyles: Options['styles'] = {
+    calendar: styles.calendar,
+    header: styles['calendar__header'],
+    headerContent: styles['calendar__header-content'],
+    arrowPrev: cn(styles['calendar__arrow'], styles['calendar__arrow_prev']),
+    arrowNext: cn(styles['calendar__arrow'], styles['calendar__arrow_next']),
+    year: styles['calendar__period'],
+    years: styles['calendar__years'],
+    yearsYear: styles['calendar__period-item'],
+    month: styles['calendar__period'],
+    months: styles['calendar__months'],
+    monthsMonth: styles['calendar__period-item'],
+    content: styles['calendar__content'],
+    week: styles['calendar__week'],
+    weekDay: styles['calendar__weekday'],
+    dates: styles['calendar__dates'],
+    date: styles['calendar__date'],
+    dateBtn: styles['calendar__date-btn'],
+    time: styles['calendar__time'],
+    timeContent: styles['calendar__time-content'],
+    timeHour: cn(styles['calendar__time-item'], styles['calendar__time-hour']),
+    timeMinute: styles['calendar__time-item'],
+    timeRanges: styles['calendar__time-ranges']
+};
+
 export const DatePicker = <IsRange extends boolean = false>({
     view,
     className,
@@ -69,6 +95,7 @@ export const DatePicker = <IsRange extends boolean = false>({
     const calendarElRef = useRef<HTMLDivElement | null>(null);
     const calendarContainerRef = useRef<HTMLDivElement | null>(null);
     const [isNodeReady, setIsNodeReady] = useState(false); // DOM node where calendar inst will be rendered has been mounted. Used just to trigger re-render for useEffect
+    const [currentMenu, setCurrentMenu] = useState<ValueOf<typeof CALENDAR_MENU>>(CALENDAR_MENU.date); // variable to show/hide time buttons (hide during month and year view)
     const initializedRef = useRef(false); // use additional ref because setCalendar is asynchronous and for strict mode executes twice in refCallback
     const isTimeChanged = useRef(false); // flag to check if time was changed using calendar controls for preventing invoke method "set" of the calendar
 
@@ -242,6 +269,22 @@ export const DatePicker = <IsRange extends boolean = false>({
             selectionDatesMode: isRange ? 'multiple-ranged' : 'single',
             enableDateToggle: false,
             selectionTimeMode: withTime ? 24 : false,
+            styles: calendarStyles,
+
+            onClickTitle(_, e) {
+                if (e.target instanceof HTMLElement) {
+                    const newMenu = e.target.dataset.vc;
+                    setCurrentMenu((menu) =>
+                        menu === newMenu ? CALENDAR_MENU.date : (newMenu as keyof typeof CALENDAR_MENU)
+                    );
+                }
+            },
+            onClickMonth() {
+                setCurrentMenu(CALENDAR_MENU.date);
+            },
+            onClickYear() {
+                setCurrentMenu(CALENDAR_MENU.date);
+            },
             // WARNING: This callback captures state values from the render scope (snapshot) when created
             onClickDate(self) {
                 const { selectedDates } = self.context;
@@ -433,9 +476,9 @@ export const DatePicker = <IsRange extends boolean = false>({
             withArrow={false}
             onOpenChange={handleTooltipOpenChange}
         >
-            <Tooltip.Trigger>
+            <Tooltip.Trigger ref={inputContainerRef} asChild>
                 <FieldContainer
-                    className={cn(['group', className])}
+                    className={cn([styles.datepicker, className])}
                     disabled={disabled}
                     error={error}
                     inputContainerSelector="[data-input-container]"
@@ -443,11 +486,10 @@ export const DatePicker = <IsRange extends boolean = false>({
                     isFocused={focused || isCalendarOpen}
                     label={label}
                     prefix={prefix}
-                    rootRef={inputContainerRef}
                     suffix={suffix}
                     view={view}
                 >
-                    <div className="flex h-full w-full items-center" data-input-container="true">
+                    <div className={styles['datepicker__inner']} data-input-container="true">
                         <InputAtomic
                             {...props}
                             ref={setInputRef(0)}
@@ -468,8 +510,12 @@ export const DatePicker = <IsRange extends boolean = false>({
                         />
                         {isRange && (
                             <>
-                                <div className="mx-2 inline-flex items-center">
-                                    <Icon className="fill-gray-300" name="arrow-right" width={16} />
+                                <div className={styles['datepicker__delimiter']}>
+                                    <Icon
+                                        className={styles['datepicker__delimiter-icon']}
+                                        name="arrow-right"
+                                        width={16}
+                                    />
                                 </div>
                                 <InputAtomic
                                     {...props}
@@ -485,15 +531,15 @@ export const DatePicker = <IsRange extends boolean = false>({
                                 />
                             </>
                         )}
-                        <div className="relative z-[1] inline-flex w-4 flex-shrink-0 cursor-pointer items-center justify-center">
-                            <Icon className="fill-gray-300 group-hover:hidden" name="calendar" width={16} />
+                        <div className={styles['datepicker__suffix']}>
+                            <Icon className={styles['datepicker-calendar']} name="calendar" width={16} />
                             <button
                                 aria-label="clear"
-                                className="hidden group-hover:inline-flex"
+                                className={styles['datepicker-clear']}
                                 type="button"
                                 onClick={handleClearClick}
                             >
-                                <Icon className="fill-gray-300 hover:fill-gray-400" name="cross" width={12} />
+                                <Icon className={styles['datepicker-clear__icon']} name="cross" width={12} />
                             </button>
                         </div>
                     </div>
@@ -501,23 +547,27 @@ export const DatePicker = <IsRange extends boolean = false>({
             </Tooltip.Trigger>
             <Tooltip.Content
                 ref={calendarContainerRef}
-                className="rounded-md border p-0"
+                className={styles['datepicker-popover']}
                 data-testid="datepicker-popup"
+                isPlain
             >
                 <div ref={calendarElRefCallback}>
-                    <div></div>
+                    <div></div> {/* Do not remove. For correct calendar initialization */}
                 </div>
-                {isCalendarOpen && isRange && withTime && (
-                    <div className="relative -mt-2 flex justify-end px-4 pb-4">
+                {isCalendarOpen && isRange && withTime && currentMenu === CALENDAR_MENU.date && (
+                    <div className={styles['datepicker-popover__buttons-container']}>
                         <button
-                            className="mr-2 rounded bg-primary px-2.5 py-1 text-white"
+                            className={cn([
+                                styles['datepicker-popover__button'],
+                                styles['datepicker-popover__button_left']
+                            ])}
                             type="button"
                             onClick={focusNextInput}
                         >
                             Next
                         </button>
                         <button
-                            className="rounded bg-primary px-2.5 py-1 text-white"
+                            className={styles['datepicker-popover__button']}
                             type="button"
                             onClick={() => {
                                 calendar && handleCalendarClose({ calendarCtx: calendar.context });

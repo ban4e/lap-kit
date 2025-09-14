@@ -10,5 +10,8 @@
     "success": "rgb(var(--color-success) / <alpha-value>)",
     "danger": "rgb(var(--color-danger) / <alpha-value>)",
     "background": "rgb(var(--color-background) / <alpha-value>)",
-    "foreground": "rgb(var(--color-foreground) / <alpha-value>)"
+    "foreground": "rgb(var(--color-foreground) / <alpha-value>)",
+    "ui-gray": "rgb(var(--color-ui-gray) / <alpha-value>)",
+    "ui-gray-subtle": "rgb(var(--color-ui-gray-subtle) / <alpha-value>)",
+    "ui-gray-strong": "rgb(var(--color-ui-gray-strong) / <alpha-value>)"
 }
