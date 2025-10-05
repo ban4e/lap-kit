@@ -1,8 +1,9 @@
-import cn from 'classnames';
+import { cva } from 'class-variance-authority';
 import React, { useCallback, useRef, useState } from 'react';
 
 import { useRect } from '@/shared/lib/hooks/useRect';
 import { ValueOf } from '@/shared/lib/types';
+import { cn } from '@/shared/lib/utils';
 
 import styles from './FieldContainer.module.css';
 
@@ -19,7 +20,7 @@ export interface IFieldContainerProps {
     error?: string;
     isFocused?: boolean;
     isFilled?: boolean;
-    className?: cn.Argument;
+    className?: Parameters<typeof cn>[0];
     children: React.ReactNode;
     suffix?: React.ReactNode;
     prefix?: React.ReactNode;
@@ -35,6 +36,31 @@ function isHTMLInputElement(target: EventTarget | null): target is HTMLInputElem
 }
 
 export const VIEWS_WITH_CLOSE_LABEL: ValueOf<typeof FieldView>[] = [FieldView.CLEAR, FieldView.FILLED];
+
+const fieldVariants = cva(styles.field, {
+    variants: {
+        view: {
+            [FieldView.FILLED]: styles.field_filled,
+            [FieldView.OUTLINED]: styles.field_outlined,
+            [FieldView.CLEAR]: styles.field_clear
+        },
+        isDisabled: {
+            true: styles['is-disabled']
+        },
+        isError: {
+            true: styles['is-error']
+        },
+        isFilled: {
+            true: styles['is-filled']
+        },
+        isFocused: {
+            true: styles['is-focused']
+        }
+    },
+    defaultVariants: {
+        view: FieldView.OUTLINED
+    }
+});
 
 export const FieldContainer = ({
     view = FieldView.OUTLINED,
@@ -115,19 +141,17 @@ export const FieldContainer = ({
         }, 50);
     }, []);
 
+    /* Classes */
+    const rootClass = fieldVariants({
+        view,
+        isDisabled: disabled,
+        isError: !!error,
+        isFilled: isFilled || !!prefix,
+        isFocused: isFocused || isKeepFocus
+    });
+
     return (
-        <div
-            ref={ref}
-            className={cn(styles.field, className, {
-                [styles['is-focused']]: isFocused || isKeepFocus,
-                [styles['is-filled']]: isFilled || prefix,
-                [styles['is-error']]: !!error,
-                [styles['is-disabled']]: disabled,
-                [styles.field_filled]: view === FieldView.FILLED,
-                [styles.field_outlined]: view === FieldView.OUTLINED,
-                [styles.field_clear]: view === FieldView.CLEAR
-            })}
-        >
+        <div ref={ref} className={cn(rootClass, className)}>
             <div
                 ref={setRef}
                 aria-hidden="true"
@@ -145,7 +169,8 @@ export const FieldContainer = ({
                     <span
                         aria-hidden="true"
                         className={cn(styles.field__side, styles.field__side_prefix, {
-                            'translate-y-[5px]': VIEWS_WITH_CLOSE_LABEL.includes(view) && typeof prefix === 'string'
+                            [styles.field__side_prefix_raised]:
+                                VIEWS_WITH_CLOSE_LABEL.includes(view) && typeof prefix === 'string'
                         })}
                         onPointerDown={handleSidePointerDown}
                     >
@@ -157,7 +182,8 @@ export const FieldContainer = ({
                     <span
                         aria-hidden="true"
                         className={cn(styles.field__side, styles.field__side_suffix, {
-                            'translate-y-[5px]': VIEWS_WITH_CLOSE_LABEL.includes(view) && typeof suffix === 'string'
+                            [styles.field__side_prefix_raised]:
+                                VIEWS_WITH_CLOSE_LABEL.includes(view) && typeof suffix === 'string'
                         })}
                         onPointerDown={handleSidePointerDown}
                     >

@@ -41,6 +41,9 @@
         &_suffix {
             @apply ml-1;
         }
+        &_raised {
+            @apply translate-y-[5px];
+        }
     }
     &__error {
         @apply absolute left-1 top-full text-[11px] leading-tight text-danger;
