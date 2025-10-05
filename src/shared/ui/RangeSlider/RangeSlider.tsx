@@ -1,9 +1,9 @@
 import cn from 'classnames';
 import { create, API as TSliderBase, target as TargetElement, Options as SliderOptions, PipsMode } from 'nouislider';
 import { memo, useEffect, useRef } from 'react';
-import './RangeSlider.css';
+import './RangeSlider.css'; // TODO: change default classes to custom classes
 
-// PipsMode is an enum, so using it in props requires importing the enum. Above types allow setting mode as a string.
+// PipsMode is an enum, so using it in props requires importing the enum. Below types allow setting mode as a string:
 type OverrideMode<T extends { mode: PipsMode }, NewMode> = Omit<T, 'mode'> & { mode: NewMode };
 type LibPips = Pick<SliderOptions, 'pips'>['pips'];
 type RequiredLibPips = Exclude<LibPips, undefined>;
@@ -11,9 +11,10 @@ type CustomPips =
     | OverrideMode<Extract<RequiredLibPips, { mode: PipsMode.Steps }>, 'steps'>
     | OverrideMode<Extract<RequiredLibPips, { mode: PipsMode.Range }>, 'range'>
     | OverrideMode<
-          Exclude<RequiredLibPips, { mode: PipsMode.Steps } | { mode: PipsMode.Range }>,
-          'positions' | 'count' | 'values'
-      >;
+        /* eslint-disable prettier/prettier */
+        Exclude<RequiredLibPips, { mode: PipsMode.Steps } | { mode: PipsMode.Range }>,
+        'positions' | 'count' | 'values'
+    >;
 type TProps = Omit<SliderOptions, 'start' | 'pips'> &
     Required<Pick<SliderOptions, 'start'>> & {
         className?: cn.Argument;
