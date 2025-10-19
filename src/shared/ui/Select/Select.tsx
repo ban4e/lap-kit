@@ -52,11 +52,11 @@ type TSelectOnChange<
 > = (
     newValue: IsMulti extends true
         ? ValueKey extends string
-            ? TSelectReturnValue<Option>[]
-            : Option[]
+        ? TSelectReturnValue<Option>[]
+        : Option[]
         : ValueKey extends string
-          ? TSelectReturnValue<Option>
-          : Option | null,
+        ? TSelectReturnValue<Option>
+        : Option | null,
     actionMeta: ActionMeta<Option>
 ) => void;
 
@@ -117,13 +117,13 @@ const ValueContainerComponent = <
         >
             {/* data-input-container is used by FieldContainer to detect width */}
             <div
-                className="relative grid h-full w-full grid-flow-col overflow-hidden"
+                className={styles['select-value-container']}
                 data-input-container="true"
                 data-value-container-inner="true"
             >
                 {props.isMulti && (
-                    <span className="absolute inset-0 flex items-center">
-                        <span className="truncate">{selectedLabels}</span>
+                    <span className={styles['select-value-container__multi']}>
+                        <span className={styles['select-value-container__multi-label']}>{selectedLabels}</span>
                     </span>
                 )}
                 {Children.map(children, (child) => {
@@ -265,17 +265,17 @@ const Select = memo(function Select<
         if (typeof onChange === 'function') {
             checkOptionIsMulti(option) && isMulti
                 ? onChange(
-                      option.map((item: Option) =>
-                          valueKey && valueKey in item ? item[valueKey as keyof Option] : (item as Option)
-                      ) as TOnChangeNewValue,
-                      meta
-                  )
+                    option.map((item: Option) =>
+                        valueKey && valueKey in item ? item[valueKey as keyof Option] : (item as Option)
+                    ) as TOnChangeNewValue,
+                    meta
+                )
                 : onChange(
-                      (valueKey && option && valueKey in option
-                          ? ((option as Option)?.[valueKey as keyof Option] ?? null)
-                          : option) as TOnChangeNewValue,
-                      meta
-                  );
+                    (valueKey && option && valueKey in option
+                        ? ((option as Option)?.[valueKey as keyof Option] ?? null)
+                        : option) as TOnChangeNewValue,
+                    meta
+                );
         }
     };
 
@@ -324,8 +324,9 @@ const Select = memo(function Select<
                     control: () => cn(styles['select-control']),
                     valueContainer: () =>
                         cn(styles['select-value'], {
-                            '!px-0': view === 'clear',
-                            'pb-1 pt-3.5': view && VIEWS_WITH_CLOSE_LABEL.includes(view) && label // TODO: This is not ideal that select knows about view
+                            [styles['select-value_clear']]: view === 'clear',
+                            [styles['select-value_indent']]: view !== 'clear',
+                            [styles['select-value_raised']]: view && VIEWS_WITH_CLOSE_LABEL.includes(view) && label // TODO: This is not ideal that select knows about view
                         }),
                     indicatorsContainer: () => styles['select-indicators-container'],
                     menu: () =>

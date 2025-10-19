@@ -1,4 +1,5 @@
 import eslint from '@eslint/js';
+import eslintConfigPrettier from 'eslint-config-prettier/flat';
 import { createTypeScriptImportResolver } from 'eslint-import-resolver-typescript';
 import eslintPluginImportX from 'eslint-plugin-import-x';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
@@ -45,7 +46,8 @@ export default tseslint.config(
             jsxA11y.flatConfigs.recommended,
             eslintPluginImportX.flatConfigs.recommended,
             eslintPluginImportX.flatConfigs.typescript,
-            eslintPluginPrettierRecommended
+            eslintPluginPrettierRecommended,
+            eslintConfigPrettier
         ],
         settings: {
             react: {
@@ -85,6 +87,7 @@ export default tseslint.config(
         },
         rules: {
             // Code style
+            indent: [2, 4, { SwitchCase: 1, offsetTernaryExpressions: 1 }],
             'comma-dangle': [2, 'never'],
             'padding-line-between-statements': [2, { blankLine: 'always', prev: '*', next: 'return' }],
             'consistent-return': 0,

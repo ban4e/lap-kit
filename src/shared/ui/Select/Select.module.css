@@ -4,10 +4,19 @@
         @apply static flex h-full flex-wrap items-center justify-between border-none outline-none;
     }
     &-single-value {
-        @apply flex items-center h-full;
+        @apply flex h-full items-center;
     }
     &-value {
-        @apply absolute inset-0 flex flex-1 items-center overflow-hidden px-3;
+        @apply absolute inset-0 flex flex-1 items-center overflow-hidden;
+        &-indent {
+            @apply px-3;
+        }
+        &_clear {
+            @apply px-0;
+        }
+        &_raised {
+            @apply pb-1 pt-3.5;
+        }
     }
     &-indicators-container {
         @apply relative ml-auto;
@@ -23,5 +32,15 @@
         &_focused {
             @apply text-foreground;
         }
+    }
+}
+
+.select-value-container {
+    @apply relative grid h-full w-full grid-flow-col overflow-hidden;
+    &__multi {
+        @apply absolute inset-0 flex items-center;
+    }
+    &__multi-label {
+        @apply truncate;
     }
 }

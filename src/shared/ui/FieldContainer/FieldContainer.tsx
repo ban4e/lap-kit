@@ -169,7 +169,7 @@ export const FieldContainer = ({
                     <span
                         aria-hidden="true"
                         className={cn(styles.field__side, styles.field__side_prefix, {
-                            [styles.field__side_prefix_raised]:
+                            [styles.field__side_raised]:
                                 VIEWS_WITH_CLOSE_LABEL.includes(view) && typeof prefix === 'string'
                         })}
                         onPointerDown={handleSidePointerDown}
