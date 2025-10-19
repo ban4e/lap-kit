@@ -6,7 +6,15 @@
 }
 
 .tooltip_main {
-    @apply text-xs rounded-md;
+    @apply rounded-md text-xs;
+}
+
+.tooltip_hidden {
+    @apply hidden;
+}
+
+.tooltip_closed {
+    @apply pointer-events-none hidden opacity-0;
 }
 
 /* PRIMARY */
@@ -17,11 +25,18 @@
     }
 }
 
-
 /* PRIMARY_INVERT */
 .tooltip_primary-invert {
     @apply bg-white text-foreground shadow-sm;
     .tooltip__arrow {
         @apply fill-white drop-shadow-sm;
     }
+}
+
+.tooltip-trigger {
+    @apply inline-block cursor-pointer;
+}
+
+.tooltip-btn {
+    @apply inline-flex h-4 w-4 items-center justify-center rounded-full bg-ui-gray text-xs font-medium text-white transition hover:bg-primary;
 }

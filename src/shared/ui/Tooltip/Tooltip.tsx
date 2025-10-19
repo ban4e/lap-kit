@@ -193,7 +193,7 @@ const TooltipTrigger = ({ children, ref: propRef, asChild = false, ...props }: T
         return (
             <div
                 ref={ref}
-                className="inline-block"
+                className={styles['tooltip-trigger']}
                 data-state={context.isOpen ? 'open' : 'closed'}
                 {...context.getReferenceProps(props)}
             >
@@ -208,7 +208,7 @@ const TooltipTrigger = ({ children, ref: propRef, asChild = false, ...props }: T
             // The user can style the trigger based on the state
             data-state={context.isOpen ? 'open' : 'closed'}
             {...context.getReferenceProps(props)}
-            className="dark:bg-n-400 inline-flex h-4 w-4 items-center justify-center rounded-full bg-gray-300 text-xs font-medium text-white transition hover:bg-primary/70 dark:hover:bg-primary/70"
+            className={styles['tooltip-btn']}
             type="button"
         >
             {'?'}
@@ -230,6 +230,17 @@ const TooltipContent = ({
 }) => {
     const context = useTooltipContext();
     const ref = useMergeRefs([context.refs.setFloating, propRef]);
+    const rootClass = cn([
+        styles.tooltip,
+        {
+            [styles['tooltip_main']]: !isPlain,
+            [styles['tooltip_primary']]: context.theme === THEMES.PRIMARY,
+            [styles['tooltip_primary-invert']]: context.theme === THEMES.PRIMARY_INVERT,
+            [styles['tooltip_hidden']]: context.middlewareData.hide?.referenceHidden,
+            [styles['tooltip_closed']]: !context.isUnmountOnHide && !context.isOpen
+        },
+        className
+    ]);
 
     if (isPlain) {
         return (
@@ -238,16 +249,7 @@ const TooltipContent = ({
                     ref={ref}
                     aria-hidden={!context.isOpen}
                     {...context.getFloatingProps(props)}
-                    className={cn([
-                        styles.tooltip,
-                        {
-                            [styles['tooltip_primary']]: context.theme === THEMES.PRIMARY,
-                            [styles['tooltip_primary-invert']]: context.theme === THEMES.PRIMARY_INVERT,
-                            hidden: context.middlewareData.hide?.referenceHidden,
-                            'pointer-events-none hidden opacity-0': !context.isUnmountOnHide && !context.isOpen
-                        },
-                        className
-                    ])}
+                    className={rootClass}
                     style={{
                         ...context.floatingStyles,
                         ...style
@@ -268,17 +270,7 @@ const TooltipContent = ({
             <div
                 ref={ref}
                 aria-hidden={!context.isOpen}
-                className={cn([
-                    styles.tooltip,
-                    styles['tooltip_main'],
-                    {
-                        [styles['tooltip_primary']]: context.theme === THEMES.PRIMARY,
-                        [styles['tooltip_primary-invert']]: context.theme === THEMES.PRIMARY_INVERT,
-                        hidden: context.middlewareData.hide?.referenceHidden,
-                        'pointer-events-none hidden opacity-0': !context.isUnmountOnHide && !context.isOpen
-                    },
-                    className
-                ])}
+                className={rootClass}
                 style={{
                     ...context.floatingStyles,
                     ...style
