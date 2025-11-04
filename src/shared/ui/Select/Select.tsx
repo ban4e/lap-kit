@@ -214,6 +214,7 @@ const Select = memo(function Select<
     valueKey = 'value' as ValueKey,
     isSearchable = false,
     isMulti = false as IsMulti,
+    menuPortalTarget = document.body,
     onChange,
     onBlur,
     onFocus,
@@ -349,6 +350,7 @@ const Select = memo(function Select<
                 isDisabled={disabled}
                 isMulti={isMulti}
                 isSearchable={isSearchable}
+                menuPortalTarget={menuPortalTarget}
                 placeholder=""
                 styles={{
                     clearIndicator: (baseStyles) => ({
@@ -384,6 +386,8 @@ const Select = memo(function Select<
                     }),
                     menuPortal: (baseStyles) => ({
                         ...baseStyles,
+                        width: `${fieldContainerRect.width}px`,
+                        left: `${fieldContainerRect.left}px`,
                         zIndex: 99
                     })
                 }}

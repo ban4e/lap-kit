@@ -8,7 +8,7 @@
     }
     &-value {
         @apply absolute inset-0 flex flex-1 items-center overflow-hidden;
-        &-indent {
+        &_indent {
             @apply px-3;
         }
         &_clear {
@@ -22,12 +22,12 @@
         @apply relative ml-auto;
     }
     &-menu {
-        @apply left-0 mt-1.5 rounded-lg border border-n-2 bg-white p-2 shadow-lg;
+        @apply left-0 mt-1.5 rounded-lg border border-ui-base-200 bg-white p-2 shadow-lg;
     }
     &-option {
-        @apply !cursor-pointer rounded-lg px-2 py-1.5 text-n-4 hover:text-foreground;
+        @apply !cursor-pointer rounded-lg px-2 py-1.5 text-ui-base-400 hover:text-foreground;
         &_selected {
-            @apply bg-n-1 text-foreground;
+            @apply bg-ui-base-100 text-foreground;
         }
         &_focused {
             @apply text-foreground;

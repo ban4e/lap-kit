@@ -25,10 +25,11 @@ export const Single: StoryObj<typeof RangeSlider> = {
         orientation: 'horizontal',
         start: 50,
         step: 1,
-        tooltips: [{ to: (val: number) => Number.parseInt(val.toString(), 10) }]
+        tooltips: [{ to: (val: number) => Number.parseInt(val.toString(), 10) }],
+        disabled: false
     },
     parameters: {
-        controls: { include: ['orientation', 'start', 'step'] }
+        controls: { include: ['orientation', 'start', 'step', 'disabled'] }
     },
     render: (args) => (
         <div
@@ -55,10 +56,11 @@ export const Multi: StoryObj<typeof RangeSlider> = {
         tooltips: [
             { to: (val: number) => Number.parseInt(val.toString(), 10) },
             { to: (val: number) => Number.parseInt(val.toString(), 10) }
-        ]
+        ],
+        disabled: false
     },
     parameters: {
-        controls: { include: ['orientation', 'start', 'step'] }
+        controls: { include: ['orientation', 'start', 'step', 'disabled'] }
     },
     render: (args) => (
         <div

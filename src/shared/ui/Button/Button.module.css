@@ -11,7 +11,7 @@
 .is-disabled {
     @apply cursor-not-allowed text-foreground/50;
     &.button_outline {
-        @apply bg-accent border-accent;
+        @apply border-accent bg-accent;
     }
     &.button_solid {
         @apply bg-accent;
@@ -65,9 +65,9 @@
     @apply bg-accent text-accent-foreground after:border-accent-foreground;
 }
 .button_theme_accent.button_outline:not(.is-disabled) {
-    @apply text-accent-foreground border-accent after:border-accent;
+    @apply border-accent text-accent-foreground after:border-accent;
 }
-.button_theme_accent.button_text:not(.is-disabled)   {
+.button_theme_accent.button_text:not(.is-disabled) {
     @apply text-accent-foreground after:border-accent-foreground;
 }
 
@@ -76,7 +76,7 @@
     @apply bg-success text-background dark:text-foreground;
 }
 .button_theme_success.button_outline:not(.is-disabled) {
-    @apply text-success border-success after:border-success;
+    @apply border-success text-success after:border-success;
 }
 .button_theme_success.button_text:not(.is-disabled) {
     @apply text-success after:border-success;
@@ -84,10 +84,10 @@
 
 /* DANGER */
 .button_theme_danger.button_solid:not(.is-disabled) {
-    @apply bg-danger dark:text-foreground text-background;
+    @apply bg-danger text-background dark:text-foreground;
 }
 .button_theme_danger.button_outline:not(.is-disabled) {
-    @apply text-danger border-danger after:border-danger;
+    @apply border-danger text-danger after:border-danger;
 }
 .button_theme_danger.button_text:not(.is-disabled) {
     @apply text-danger after:border-danger;

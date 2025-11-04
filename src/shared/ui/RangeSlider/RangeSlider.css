@@ -1,3 +1,6 @@
+.range-target {
+    @apply relative z-0;
+}
 .range-target,
 .range-target * {
     @apply block touch-none select-none;
@@ -5,17 +8,17 @@
 }
 .range-base,
 .range-connects {
-    @apply w-full h-full relative z-[1];
+    @apply relative h-full w-full;
 }
 .range-base {
-    @apply relative bg-n-1 rounded before:absolute before:inset-0 before:border before:border-n-2/50 before:rounded-inherit;
+    @apply bg-ui-base-100 relative rounded before:absolute before:inset-0 before:rounded-inherit before:border before:border-ui-base-200/75;
 }
 .range-connects {
     @apply overflow-hidden rounded;
 }
 .range-connect,
 .range-origin {
-    @apply absolute top-0 right-0 w-full h-full origin-top-left will-change-transform z-[1];
+    @apply absolute right-0 top-0 h-full w-full origin-top-left will-change-transform;
     -webkit-transform-style: preserve-3d;
     transform-style: flat;
 }
@@ -23,7 +26,7 @@
     @apply bg-primary;
 }
 .range-handle {
-    @apply absolute w-5 h-5 rounded-full bg-primary after:absolute after:top-1/2 after:left-1/2 after:-translate-x-1/2 after:-translate-y-1/2 after:block after:w-2.5 after:h-2.5 after:rounded-full after:bg-white before:absolute before:-inset-1 before:block before:bg-primary/30 before:rounded-full before:transition-all before:scale-0;
+    @apply absolute h-5 w-5 rounded-full bg-primary before:absolute before:-inset-1 before:block before:scale-0 before:rounded-full before:bg-primary/30 before:transition-all after:absolute after:left-1/2 after:top-1/2 after:block after:h-2.5 after:w-2.5 after:-translate-x-1/2 after:-translate-y-1/2 after:rounded-full after:bg-white;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
 }
@@ -34,10 +37,10 @@
     @apply before:scale-100;
 }
 .range-tooltip {
-    @apply absolute p-1.5 rounded-md bg-primary text-white text-center whitespace-nowrap text-xs font-medium;
+    @apply absolute whitespace-nowrap rounded-md bg-primary p-1.5 text-center text-xs font-medium text-white;
 }
 .range-touch-area {
-    @apply w-full h-full;
+    @apply h-full w-full;
 }
 .range-horizontal {
     @apply w-full;
@@ -45,13 +48,13 @@
         @apply h-1.5;
     }
     .range-handle {
-        @apply -top-2.5 -right-2.5 translate-y-[2px];
+        @apply -right-2.5 -top-2.5 translate-y-[2px];
     }
     .range-origin {
         @apply h-0;
     }
     .range-tooltip {
-        @apply left-1/2 bottom-full -translate-x-1/2 -translate-y-2.5 before:absolute before:top-full before:left-1/2 before:block before:border-t-[6px] before:border-l-[6px] before:border-r-[6px] before:border-t-primary before:border-transparent before:-translate-x-1/2;
+        @apply bottom-full left-1/2 -translate-x-1/2 -translate-y-2.5 before:absolute before:left-1/2 before:top-full before:block before:-translate-x-1/2 before:border-l-[6px] before:border-r-[6px] before:border-t-[6px] before:border-transparent before:border-t-primary;
     }
 }
 .range-vertical {
@@ -63,24 +66,24 @@
         @apply -top-full w-0;
     }
     .range-tooltip {
-        @apply top-1/2 right-full -translate-x-2.5 -translate-y-1/2;
+        @apply right-full top-1/2 -translate-x-2.5 -translate-y-1/2;
     }
 }
 .range-pips {
-    @apply relative text-xs text-n-3;
+    @apply relative text-xs text-ui-base-400;
     &-horizontal {
-        @apply top-full left-0 w-full pt-2 h-7;
+        @apply left-0 top-full h-7 w-full pt-2;
     }
     &-vertical {
         @apply bottom-full left-full h-full pl-2;
     }
 }
 .range-marker {
-    @apply absolute bg-n-3;
+    @apply absolute bg-ui-base-300;
 }
 .range-marker-horizontal {
     &.range-marker {
-        @apply w-0.5 h-1 -ml-px;
+        @apply -ml-px h-1 w-0.5;
     }
     &.range-marker-sub {
         @apply h-1.5;
@@ -91,7 +94,7 @@
 }
 .range-marker-vertical {
     &.range-marker {
-        @apply w-1 h-0.5 -mt-px;
+        @apply -mt-px h-0.5 w-1;
     }
     &.range-marker-sub {
         @apply w-1.5;
@@ -103,14 +106,14 @@
 .range-value {
     @apply absolute whitespace-nowrap text-center;
     &-sub {
-        @apply text-n-3/70 text-[10px];
+        @apply text-[10px] text-ui-base-300;
     }
 }
 .range-value-horizontal {
     @apply -translate-x-1/2 translate-y-1/2;
 }
 .range-value-vertical {
-    @apply pl-3 -translate-y-1/2;
+    @apply -translate-y-1/2 pl-3;
 }
 .range-rtl .range-value-vertical {
     @apply translate-y-1/2;
@@ -126,17 +129,17 @@
 .range-vertical .range-draggable {
     cursor: ns-resize;
 }
-[aria-disabled] {
+[aria-disabled='true'] {
     &.range-target {
         @apply cursor-not-allowed;
     }
     & .range-connect {
-        @apply bg-n-4;
+        @apply bg-ui-base-400;
     }
     & .range-handle {
-        @apply cursor-not-allowed bg-n-4;
+        @apply cursor-not-allowed bg-ui-base-400;
     }
     & .range-tooltip {
-        @apply bg-n-4 before:border-t-n-4;
+        @apply bg-ui-base-400 before:border-t-ui-base-400;
     }
 }

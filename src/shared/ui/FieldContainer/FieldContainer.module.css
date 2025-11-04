@@ -2,13 +2,17 @@
     @apply px-3;
 }
 
+.label-text {
+    @apply text-ui-base-400/90;
+}
+
 .field {
     @apply relative;
     &__container {
         @apply field-spacing-x relative flex h-12 cursor-text items-center;
     }
     &__label {
-        @apply pointer-events-none absolute left-3 top-1/2 max-w-[calc(100%-theme(space.6))] origin-top-left -translate-y-1/2 transform truncate leading-tight text-n-4 ease-in dark:text-n-5;
+        @apply label-text pointer-events-none absolute left-3 top-1/2 max-w-[calc(100%-theme(space.6))] origin-top-left -translate-y-1/2 transform truncate leading-tight ease-in;
         transition-property: color, transform, max-width;
         transition-delay: 0s, 0s, 50ms;
         transition-duration: 150ms, 150ms, 150ms;
@@ -34,7 +38,7 @@
         }
     }
     &__side {
-        @apply relative flex max-h-full flex-shrink-0 items-center leading-tight text-n-5 dark:text-n-5;
+        @apply label-text relative flex max-h-full flex-shrink-0 items-center leading-tight;
         &_prefix {
             @apply mr-1;
         }
@@ -62,22 +66,22 @@
     }
 }
 .field.is-disabled {
-    @apply text-n-3;
+    @apply text-ui-base-300;
     input {
-        @apply text-n-3;
+        @apply text-ui-base-300;
     }
     .field__label {
-        @apply text-n-3;
+        @apply text-ui-base-300;
     }
     .field__side {
-        @apply text-n-3/90;
+        @apply text-ui-base-300;
     }
 }
 
 /* VIEW FILLED */
 .field_filled {
     .field__container {
-        @apply rounded-lg bg-n-1 before:absolute before:inset-0 before:block before:rounded-inherit before:border before:border-transparent before:transition dark:bg-n-8;
+        @apply bg-ui-base-100 dark:bg-ui-base-800 rounded-lg before:absolute before:inset-0 before:block before:rounded-inherit before:border before:border-transparent before:transition;
     }
     input {
         @apply pb-1 pt-3.5;
@@ -103,7 +107,7 @@
 /* VIEW OUTLINED */
 .field_outlined {
     .field__fieldset {
-        @apply field-spacing-x absolute inset-0 min-w-0 rounded-lg border border-n-3 transition dark:border-n-6;
+        @apply field-spacing-x dark:border-ui-base-600 absolute inset-0 min-w-0 rounded-lg border border-ui-base-300 transition;
         transition-property: border;
     }
     .field__legend {
@@ -135,7 +139,7 @@
 }
 .field_outlined.is-disabled {
     .field__fieldset {
-        @apply border-n-2;
+        @apply border-ui-base-200;
     }
 }
 

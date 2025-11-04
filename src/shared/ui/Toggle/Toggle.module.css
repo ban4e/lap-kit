@@ -1,10 +1,10 @@
 .toggle {
     @apply relative inline-flex;
     &__input-container {
-        @apply relative rounded-md w-5 h-5;
+        @apply relative h-5 w-5 rounded-md;
     }
     &__input {
-        @apply absolute inset-0 rounded-inherit appearance-none outline-none cursor-pointer z-[1];
+        @apply absolute inset-0 z-[1] cursor-pointer appearance-none rounded-inherit outline-none;
         &:checked + .toggle__mark {
             @apply bg-opacity-100 after:border-transparent;
             .toggle__mark-icon {
@@ -12,10 +12,10 @@
             }
         }
         &:not(:checked):not(:focus-visible) + .toggle__mark {
-            @apply after:border-n-3;
+            @apply after:border-ui-base-300;
         }
         &:focus-visible + .toggle__mark {
-            @apply after:border-transparent after:transition before:shadow-[0_0_0_4px_theme('colors.primary')] before:opacity-50;
+            @apply before:opacity-50 before:shadow-[0_0_0_4px_theme('colors.primary')] after:border-transparent after:transition;
         }
     }
     &__input[type='checkbox'] + .toggle__mark {
@@ -28,17 +28,17 @@
     &__input[type='radio'] + .toggle__mark {
         @apply rounded-full before:rounded-full;
         .toggle__mark-icon {
-            @apply absolute top-1/2 left-1/2 w-2.5 h-2.5 -translate-x-1/2 -translate-y-1/2 rounded-inherit bg-white;
+            @apply absolute left-1/2 top-1/2 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-inherit bg-white;
         }
     }
     &__mark {
-        @apply absolute inset-0 bg-primary bg-opacity-0 before:absolute before:inset-px before:pointer-events-none before:transition after:absolute after:inset-0 after:border after:rounded-inherit after:pointer-events-none;
+        @apply absolute inset-0 bg-primary bg-opacity-0 before:pointer-events-none before:absolute before:inset-px before:transition after:pointer-events-none after:absolute after:inset-0 after:rounded-inherit after:border;
         &-icon {
             @apply absolute opacity-0;
         }
     }
     &__label {
-        @apply cursor-pointer leading-tight ml-1;
+        @apply ml-1 cursor-pointer leading-tight;
     }
     &__error {
         @apply absolute left-0 top-full text-[11px] leading-tight text-danger;
@@ -58,16 +58,16 @@
             @apply after:border-danger;
         }
         &:focus-visible + .toggle__mark {
-            @apply before:shadow-[0_0_0_4px_theme('colors.danger')] before:opacity-80;
+            @apply before:opacity-80 before:shadow-[0_0_0_4px_theme('colors.danger')];
         }
     }
 }
 .toggle.is-disabled {
     .toggle__mark {
-        @apply bg-n-3;
+        @apply bg-ui-base-300;
     }
     .toggle__label {
-        @apply cursor-default text-n-3;
+        @apply cursor-default text-ui-base-300;
     }
     .toggle__input {
         @apply cursor-default;

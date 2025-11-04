@@ -11,7 +11,13 @@
     "danger": "rgb(var(--color-danger) / <alpha-value>)",
     "background": "rgb(var(--color-background) / <alpha-value>)",
     "foreground": "rgb(var(--color-foreground) / <alpha-value>)",
-    "ui-gray": "rgb(var(--color-ui-gray) / <alpha-value>)",
-    "ui-gray-subtle": "rgb(var(--color-ui-gray-subtle) / <alpha-value>)",
-    "ui-gray-strong": "rgb(var(--color-ui-gray-strong) / <alpha-value>)"
+    "ui-base-100": "rgb(var(--color-ui-base-100) / <alpha-value>)",
+    "ui-base-200": "rgb(var(--color-ui-base-200) / <alpha-value>)",
+    "ui-base-300": "rgb(var(--color-ui-base-300) / <alpha-value>)",
+    "ui-base-400": "rgb(var(--color-ui-base-400) / <alpha-value>)",
+    "ui-base-500": "rgb(var(--color-ui-base-500) / <alpha-value>)",
+    "ui-base-600": "rgb(var(--color-ui-base-600) / <alpha-value>)",
+    "ui-base-700": "rgb(var(--color-ui-base-700) / <alpha-value>)",
+    "ui-base-800": "rgb(var(--color-ui-base-800) / <alpha-value>)",
+    "ui-base-900": "rgb(var(--color-ui-base-900) / <alpha-value>)"
 }

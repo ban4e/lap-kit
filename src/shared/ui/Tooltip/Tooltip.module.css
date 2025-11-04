@@ -38,5 +38,5 @@
 }
 
 .tooltip-btn {
-    @apply inline-flex h-4 w-4 items-center justify-center rounded-full bg-ui-gray text-xs font-medium text-white transition hover:bg-primary;
+    @apply inline-flex h-4 w-4 items-center justify-center rounded-full bg-ui-base-300 text-xs font-medium text-white transition hover:bg-primary;
 }

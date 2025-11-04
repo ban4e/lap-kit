@@ -38,6 +38,9 @@ export const Default: StoryObj<typeof Select> = {
         label: {
             control: 'text'
         },
+        menuPortalTarget: {
+            description: 'Use `null` to prevent from portaling. Default is `document.body`.',
+        },
         prefix: {
             control: 'text'
         },
@@ -62,12 +65,13 @@ export const Default: StoryObj<typeof Select> = {
         prefix: '',
         disabled: false,
         error: '',
+        menuPortalTarget: typeof document !== 'undefined' ? document.body : null,
         label: 'Very long overflowed label text',
         view: 'outlined',
         isMulti: false
     },
     parameters: {
-        controls: { include: ['suffix', 'prefix', 'disabled', 'isMulti', 'error', 'label', 'view'] }
+        controls: { include: ['suffix', 'prefix', 'disabled', 'isMulti', 'error', 'label', 'view', 'menuPortalTarget'], expanded: true }
     },
     render: (args) => (
         <div

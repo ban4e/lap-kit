@@ -13,19 +13,19 @@
     &__delimiter {
         @apply mx-2 inline-flex items-center;
         &-icon {
-            @apply fill-ui-gray;
+            @apply fill-ui-base-300;
         }
     }
     &__suffix {
-        @apply relative z-[1] inline-flex w-4 flex-shrink-0 cursor-pointer items-center justify-center;
+        @apply relative inline-flex w-4 flex-shrink-0 cursor-pointer items-center justify-center;
     }
     &-calendar {
-        @apply fill-ui-gray;
+        @apply fill-ui-base-300;
     }
     &-clear {
         @apply hidden;
         &__icon {
-            @apply fill-ui-gray transition hover:fill-ui-gray-strong;
+            @apply fill-ui-base-300 transition hover:fill-ui-base-400;
         }
     }
 }
@@ -60,7 +60,7 @@
         @apply flex flex-1 items-center justify-center px-2 text-base font-bold;
     }
     &__arrow {
-        @apply relative block h-7 w-7 rounded-md bg-ui-gray-subtle bg-opacity-0 transition before:absolute before:inset-0 before:bg-center before:bg-no-repeat hover:bg-opacity-100;
+        @apply bg-ui-base-100 relative block h-7 w-7 rounded-md bg-opacity-0 transition before:absolute before:inset-0 before:bg-center before:bg-no-repeat hover:bg-opacity-100;
         &::before {
             background-image: url('data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjIwIiB3aWR0aD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNC41MTYgNy41NDhjMC40MzYtMC40NDYgMS4wNDMtMC40ODEgMS41NzYgMGwzLjkwOCAzLjc0NyAzLjkwOC0zLjc0N2MwLjUzMy0wLjQ4MSAxLjE0MS0wLjQ0NiAxLjU3NCAwIDAuNDM2IDAuNDQ1IDAuNDA4IDEuMTk3IDAgMS42MTUtMC40MDYgMC40MTgtNC42OTUgNC41MDItNC42OTUgNC41MDItMC4yMTcgMC4yMjMtMC41MDIgMC4zMzUtMC43ODcgMC4zMzVzLTAuNTctMC4xMTItMC43ODktMC4zMzVjMCAwLTQuMjg3LTQuMDg0LTQuNjk1LTQuNTAycy0wLjQzNi0xLjE3IDAtMS42MTV6IiAvPjwvc3ZnPg==');
         }
@@ -81,7 +81,7 @@
         @apply mb-2 grid grid-cols-7 items-center justify-items-center;
     }
     &__weekday {
-        @apply inline-flex w-7 items-center justify-center text-ui-gray-strong;
+        @apply inline-flex w-7 items-center justify-center text-ui-base-400;
         &[data-vc-week-day-off] {
             @apply text-danger;
         }
@@ -117,10 +117,10 @@
         }
     }
     &__date-btn {
-        @apply absolute inset-0 font-medium text-foreground transition hover:bg-ui-gray-subtle;
+        @apply hover:bg-ui-base-100 absolute inset-0 font-medium text-foreground transition;
     }
     &__time {
-        @apply mt-3 flex items-center border-t border-ui-gray pt-3;
+        @apply mt-3 flex items-center border-t border-ui-base-300 pt-3;
     }
     &__time-content {
         @apply flex items-center justify-center;
@@ -132,7 +132,7 @@
         }
     }
     &__time-hour {
-        @apply ml-10 mr-2 before:absolute before:-left-10 before:top-1/2 before:block before:-translate-y-1/2 before:text-sm before:text-ui-gray-strong before:content-['Time:'] after:absolute after:left-full after:top-1/2 after:-translate-y-1/2 after:font-bold after:content-[':'];
+        @apply ml-10 mr-2 before:absolute before:-left-10 before:top-1/2 before:block before:-translate-y-1/2 before:text-sm before:text-ui-base-400 before:content-['Time:'] after:absolute after:left-full after:top-1/2 after:-translate-y-1/2 after:font-bold after:content-[':'];
     }
     &__time-ranges {
         @apply hidden;
@@ -144,7 +144,7 @@
         @apply grid grid-cols-3 items-center gap-2;
     }
     &__period-item {
-        @apply flex h-10 items-center justify-center rounded text-sm font-medium transition hover:bg-ui-gray-subtle;
+        @apply hover:bg-ui-base-100 flex h-10 items-center justify-center rounded text-sm font-medium transition;
         &[data-vc-months-month-selected] {
             @apply datepicker-btn-primary;
         }
