@@ -2,7 +2,7 @@
 
 @layer components {
     .datepicker-btn-primary {
-        @apply bg-gradient-to-b from-primary/75 to-primary text-white;
+        @apply bg-gradient-to-b from-primary/75 to-primary text-foreground;
     }
 }
 
@@ -39,7 +39,7 @@
 }
 
 .datepicker-popover {
-    @apply rounded-lg border border-ui-base-200 p-0;
+    @apply rounded-lg border border-ui-base-200 p-0 dark:border-ui-base-600;
     &__buttons-container {
         @apply relative -mt-2 flex justify-end px-4 pb-4;
     }
@@ -60,9 +60,14 @@
         @apply flex flex-1 items-center justify-center px-2 text-base font-bold;
     }
     &__arrow {
-        @apply bg-ui-base-100 relative block h-7 w-7 rounded-md bg-opacity-0 transition before:absolute before:inset-0 before:bg-center before:bg-no-repeat hover:bg-opacity-100;
+        @apply relative block h-7 w-7 rounded-md bg-ui-base-100 bg-opacity-0 transition before:absolute before:inset-0 before:bg-center before:bg-no-repeat hover:bg-opacity-100 dark:bg-ui-base-800 dark:bg-opacity-0 dark:hover:bg-opacity-100;
         &::before {
-            background-image: url('data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjIwIiB3aWR0aD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNC41MTYgNy41NDhjMC40MzYtMC40NDYgMS4wNDMtMC40ODEgMS41NzYgMGwzLjkwOCAzLjc0NyAzLjkwOC0zLjc0N2MwLjUzMy0wLjQ4MSAxLjE0MS0wLjQ0NiAxLjU3NCAwIDAuNDM2IDAuNDQ1IDAuNDA4IDEuMTk3IDAgMS42MTUtMC40MDYgMC40MTgtNC42OTUgNC41MDItNC42OTUgNC41MDItMC4yMTcgMC4yMjMtMC41MDIgMC4zMzUtMC43ODcgMC4zMzVzLTAuNTctMC4xMTItMC43ODktMC4zMzVjMCAwLTQuMjg3LTQuMDg0LTQuNjk1LTQuNTAycy0wLjQzNi0xLjE3IDAtMS42MTV6IiAvPjwvc3ZnPg==');
+            background-color: currentColor;
+            mask-image: url('data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjIwIiB3aWR0aD0iMjAiIHZpZXdCb3g9IjAgMCAyMCAyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNC41MTYgNy41NDhjMC40MzYtMC40NDYgMS4wNDMtMC40ODEgMS41NzYgMGwzLjkwOCAzLjc0NyAzLjkwOC0zLjc0N2MwLjUzMy0wLjQ4MSAxLjE0MS0wLjQ0NiAxLjU3NCAwIDAuNDM2IDAuNDQ1IDAuNDA4IDEuMTk3IDAgMS42MTUtMC40MDYgMC40MTgtNC42OTUgNC41MDItNC42OTUgNC41MDItMC4yMTcgMC4yMjMtMC41MDIgMC4zMzUtMC43ODcgMC4zMzVzLTAuNTctMC4xMTItMC43ODktMC4zMzVjMCAwLTQuMjg3LTQuMDg0LTQuNjk1LTQuNTAycy0wLjQzNi0xLjE3IDAtMS42MTV6IiAvPjwvc3ZnPg==');
+            mask-size: 20px;
+            mask-repeat: no-repeat;
+            mask-position: center;
+            @apply text-foreground;
         }
         &_prev {
             @apply before:rotate-90;
@@ -117,7 +122,7 @@
         }
     }
     &__date-btn {
-        @apply hover:bg-ui-base-100 absolute inset-0 font-medium text-foreground transition;
+        @apply absolute inset-0 font-medium text-foreground transition hover:bg-ui-base-100 dark:hover:bg-ui-base-800;
     }
     &__time {
         @apply mt-3 flex items-center border-t border-ui-base-300 pt-3;
@@ -128,7 +133,7 @@
     &__time-item {
         @apply relative w-8 pr-px;
         & input {
-            @apply block w-full p-0.5 text-base font-bold;
+            @apply block w-full p-0.5 text-base font-bold dark:bg-background;
         }
     }
     &__time-hour {
@@ -144,7 +149,7 @@
         @apply grid grid-cols-3 items-center gap-2;
     }
     &__period-item {
-        @apply hover:bg-ui-base-100 flex h-10 items-center justify-center rounded text-sm font-medium transition;
+        @apply flex h-10 items-center justify-center rounded text-sm font-medium transition hover:bg-ui-base-100 dark:hover:bg-ui-base-800;
         &[data-vc-months-month-selected] {
             @apply datepicker-btn-primary;
         }

@@ -38,7 +38,7 @@
         }
     }
     &__label {
-        @apply ml-1 cursor-pointer leading-tight;
+        @apply ml-1 cursor-pointer leading-tight text-foreground;
     }
     &__error {
         @apply absolute left-0 top-full text-[11px] leading-tight text-danger;

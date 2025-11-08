@@ -18,7 +18,7 @@
         transition-duration: 150ms, 150ms, 150ms;
     }
     input {
-        @apply relative block h-full w-full resize-none rounded-inherit border-none bg-transparent leading-tight text-foreground outline-none transition dark:text-white;
+        @apply relative block h-full w-full resize-none rounded-inherit border-none bg-transparent leading-tight text-foreground outline-none transition;
         &:-webkit-autofill,
         &-internal-autofill-selected {
             background-color: transparent !important;
