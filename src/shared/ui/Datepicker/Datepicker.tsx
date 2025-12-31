@@ -5,7 +5,6 @@ import { Calendar, DatesArr, type Options } from 'vanilla-calendar-pro';
 import { ValueOf } from '@/shared/lib/types';
 import { cn } from '@/shared/lib/utils';
 import { FieldContainer } from '@/shared/ui/FieldContainer';
-import { Icon } from '@/shared/ui/Icon';
 import { InputAtomic } from '@/shared/ui/Input';
 import { Tooltip } from '@/shared/ui/Tooltip';
 
@@ -511,11 +510,7 @@ export const DatePicker = <IsRange extends boolean = false>({
                         {isRange && (
                             <>
                                 <div className={styles['datepicker__delimiter']}>
-                                    <Icon
-                                        className={styles['datepicker__delimiter-icon']}
-                                        name="arrow-right"
-                                        width={16}
-                                    />
+                                    <div className={styles['datepicker__delimiter-icon']} />
                                 </div>
                                 <InputAtomic
                                     {...props}
@@ -532,14 +527,14 @@ export const DatePicker = <IsRange extends boolean = false>({
                             </>
                         )}
                         <div className={styles['datepicker__suffix']}>
-                            <Icon className={styles['datepicker-calendar']} name="calendar" width={16} />
+                            <div className={styles['datepicker-calendar']} />
                             <button
                                 aria-label="clear"
                                 className={styles['datepicker-clear']}
                                 type="button"
                                 onClick={handleClearClick}
                             >
-                                <Icon className={styles['datepicker-clear__icon']} name="cross" width={12} />
+                                <span className={styles['datepicker-clear__icon']}>×</span>
                             </button>
                         </div>
                     </div>
