@@ -1,0 +1,20 @@
+{
+  "name": "Select",
+  "dependencies": {
+    "external": [
+      "classnames"
+    ],
+    "registry": [
+      "FieldContainer"
+    ],
+    "shared": [
+      "@/shared/lib/hooks/useCombinedRefs",
+      "@/shared/lib/hooks/useRect"
+    ]
+  },
+  "files": [
+    "src/shared/ui/Select/Select.module.css",
+    "src/shared/ui/Select/Select.tsx",
+    "src/shared/ui/Select/index.tsx"
+  ]
+}

@@ -43,7 +43,6 @@
         "isolatedModules": true,
         "noEmit": true,
         "jsx": "react-jsx",
-
         /* Linting */
         "strict": true,
         "noUnusedLocals": true,
@@ -53,7 +52,8 @@
     },
     "include": [
         "src",
-        "types"
+        "types",
+        "registry"
     ],
     "references": [
         {

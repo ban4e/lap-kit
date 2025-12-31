@@ -1,0 +1,22 @@
+{
+  "name": "Button",
+  "dependencies": {
+    "external": [
+      "class-variance-authority",
+      "react-transition-group"
+    ],
+    "registry": [],
+    "shared": [
+      "@/shared/lib/hooks/usePulse",
+      "@/shared/lib/hooks/useRect",
+      "@/shared/lib/types",
+      "@/shared/lib/utils"
+    ]
+  },
+  "files": [
+    "src/shared/ui/Button/Button.module.css",
+    "src/shared/ui/Button/Button.tsx",
+    "src/shared/ui/Button/Button.variants.tsx",
+    "src/shared/ui/Button/index.tsx"
+  ]
+}

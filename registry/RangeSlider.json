@@ -1,0 +1,16 @@
+{
+  "name": "RangeSlider",
+  "dependencies": {
+    "external": [
+      "classnames",
+      "nouislider"
+    ],
+    "registry": [],
+    "shared": []
+  },
+  "files": [
+    "src/shared/ui/RangeSlider/RangeSlider.css",
+    "src/shared/ui/RangeSlider/RangeSlider.tsx",
+    "src/shared/ui/RangeSlider/index.tsx"
+  ]
+}

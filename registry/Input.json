@@ -1,0 +1,20 @@
+{
+  "name": "Input",
+  "dependencies": {
+    "external": [
+      "classnames",
+      "imask"
+    ],
+    "registry": [
+      "FieldContainer"
+    ],
+    "shared": [
+      "@/shared/lib/hooks/useCombinedRefs"
+    ]
+  },
+  "files": [
+    "src/shared/ui/Input/Input.tsx",
+    "src/shared/ui/Input/InputAtomic.tsx",
+    "src/shared/ui/Input/index.tsx"
+  ]
+}

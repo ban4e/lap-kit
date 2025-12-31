@@ -1,0 +1,15 @@
+{
+  "name": "Toggle",
+  "dependencies": {
+    "external": [
+      "classnames"
+    ],
+    "registry": [],
+    "shared": []
+  },
+  "files": [
+    "src/shared/ui/Toggle/Toggle.module.css",
+    "src/shared/ui/Toggle/Toggle.tsx",
+    "src/shared/ui/Toggle/index.tsx"
+  ]
+}

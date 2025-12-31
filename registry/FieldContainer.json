@@ -1,0 +1,19 @@
+{
+  "name": "FieldContainer",
+  "dependencies": {
+    "external": [
+      "class-variance-authority"
+    ],
+    "registry": [],
+    "shared": [
+      "@/shared/lib/hooks/useRect",
+      "@/shared/lib/types",
+      "@/shared/lib/utils"
+    ]
+  },
+  "files": [
+    "src/shared/ui/FieldContainer/FieldContainer.module.css",
+    "src/shared/ui/FieldContainer/FieldContainer.tsx",
+    "src/shared/ui/FieldContainer/index.tsx"
+  ]
+}

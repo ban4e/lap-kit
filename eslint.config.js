@@ -36,7 +36,81 @@ export default tseslint.config(
         }
     },
     {
-        files: ['**/*.{js,jsx,mjs,cjs,ts,tsx}'],
+        files: ['**/*.{cjs}'],
+        extends: [
+            eslint.configs.recommended,
+            eslintPluginImportX.flatConfigs.recommended,
+            eslintPluginPrettierRecommended,
+            eslintConfigPrettier
+        ],
+        rules: {
+            // Code style
+            indent: [2, 4, { SwitchCase: 1, offsetTernaryExpressions: true }],
+            'comma-dangle': [2, 'never'],
+            'padding-line-between-statements': [2, { blankLine: 'always', prev: '*', next: 'return' }],
+            'consistent-return': 0,
+            'no-undef': 0, // This rule is disabled for TypeScript files because TS type checker already ensures that variables are declared and defined.
+            'no-unused-expressions': [
+                2,
+                {
+                    allowTernary: true,
+                    allowShortCircuit: true
+                }
+            ],
+            'no-console': [2, { allow: ['warn', 'error', 'info'] }],
+            'no-plusplus': 0,
+            'no-param-reassign': [2, { props: false }],
+            'no-restricted-syntax': 0,
+            'no-nested-ternary': 0,
+            'max-classes-per-file': 0,
+            eqeqeq: 2,
+            'prefer-arrow-callback': [2, { allowNamedFunctions: true }],
+
+            // Imports
+            'import-x/no-cycle': 2,
+            'import-x/no-unresolved': 2,
+            'import-x/extensions': [
+                2,
+                'ignorePackages',
+                {
+                    '': 'never', // this isn't the best solution, because it doesn't require extensions at all
+                    js: 'never',
+                    jsx: 'never',
+                    ts: 'never',
+                    tsx: 'never',
+                    'd.ts': 'always'
+                }
+            ],
+            'import-x/no-extraneous-dependencies': [2, { devDependencies: true }],
+            'import-x/order': [
+                2,
+                {
+                    groups: ['builtin', 'external', 'internal', ['sibling', 'parent'], 'object', 'type'],
+                    pathGroups: [
+                        {
+                            pattern: '@/**',
+                            group: 'internal',
+                            position: 'before'
+                        },
+                        {
+                            pattern: '@components/**',
+                            group: 'internal',
+                            position: 'before'
+                        }
+                    ],
+                    pathGroupsExcludedImportTypes: ['builtin', 'object'],
+                    'newlines-between': 'always',
+                    alphabetize: {
+                        order: 'asc' /* sort in ascending order */,
+                        caseInsensitive: false /* ignore case */
+                    }
+                }
+            ],
+            'import-x/prefer-default-export': 0
+        }
+    },
+    {
+        files: ['**/*.{js,jsx,mjs,ts,tsx}'],
         extends: [
             eslint.configs.recommended,
             ...tsConfigs.recommended,
@@ -87,7 +161,7 @@ export default tseslint.config(
         },
         rules: {
             // Code style
-            indent: [2, 4, { SwitchCase: 1, offsetTernaryExpressions: 1 }],
+            indent: [2, 4, { SwitchCase: 1, offsetTernaryExpressions: true }],
             'comma-dangle': [2, 'never'],
             'padding-line-between-statements': [2, { blankLine: 'always', prev: '*', next: 'return' }],
             'consistent-return': 0,
@@ -99,7 +173,7 @@ export default tseslint.config(
                     allowShortCircuit: true
                 }
             ],
-            'no-console': [2, { allow: ['warn', 'error'] }],
+            'no-console': [2, { allow: ['warn', 'error', 'info'] }],
             'no-plusplus': 0,
             'no-param-reassign': [2, { props: false }],
             'no-restricted-syntax': 0,

@@ -12,7 +12,9 @@
         "build-storybook": "storybook build",
         "test": "vitest run",
         "coverage": "vitest run --coverage",
-        "check-types": "tsc --noEmit"
+        "check-types": "tsc --noEmit",
+        "generate-registry": "npx tsx registry/autoGenerate.ts",
+        "generate-all-registries": "npx tsx registry/autoGenerate.ts --all"
     },
     "dependencies": {
         "@floating-ui/react": "^0.27.4",
@@ -45,7 +47,7 @@
         "autoprefixer": "^10.4.16",
         "class-variance-authority": "^0.7.1",
         "eslint": "^9.17.0",
-        "eslint-config-prettier": "^9.1.0",
+        "eslint-config-prettier": "^10.1.8",
         "eslint-import-resolver-typescript": "^3.7.0",
         "eslint-plugin-import-x": "^4.6.1",
         "eslint-plugin-jsx-a11y": "^6.10.2",

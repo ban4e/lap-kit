@@ -1,0 +1,13 @@
+{
+  "name": "Icon",
+  "dependencies": {
+    "external": [],
+    "registry": [],
+    "shared": []
+  },
+  "files": [
+    "src/shared/ui/Icon/Icon.tsx",
+    "src/shared/ui/Icon/index.tsx",
+    "src/shared/ui/Icon/useDynamicSvgImport.ts"
+  ]
+}

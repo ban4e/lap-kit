@@ -1,0 +1,25 @@
+{
+  "name": "Datepicker",
+  "dependencies": {
+    "external": [
+      "@floating-ui/react",
+      "vanilla-calendar-pro"
+    ],
+    "registry": [
+      "FieldContainer",
+      "Input",
+      "Tooltip"
+    ],
+    "shared": [
+      "@/shared/lib/types",
+      "@/shared/lib/utils"
+    ]
+  },
+  "files": [
+    "src/shared/ui/Datepicker/Datepicker.constants.ts",
+    "src/shared/ui/Datepicker/Datepicker.module.css",
+    "src/shared/ui/Datepicker/Datepicker.tsx",
+    "src/shared/ui/Datepicker/Datepicker.utils.ts",
+    "src/shared/ui/Datepicker/index.tsx"
+  ]
+}

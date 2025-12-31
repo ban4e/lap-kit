@@ -1,0 +1,16 @@
+{
+  "name": "Tooltip",
+  "dependencies": {
+    "external": [],
+    "registry": [],
+    "shared": [
+      "@/shared/lib/types",
+      "@/shared/lib/utils"
+    ]
+  },
+  "files": [
+    "src/shared/ui/Tooltip/Tooltip.module.css",
+    "src/shared/ui/Tooltip/Tooltip.tsx",
+    "src/shared/ui/Tooltip/index.tsx"
+  ]
+}

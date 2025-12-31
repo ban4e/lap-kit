@@ -1,8 +1,9 @@
-import palette from './palette.json';
 const colors = require('tailwindcss/colors');
 
+const palette = require('./palette.json');
+
 /** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
     darkMode: ['class', '[data-mode="dark"]'],
     content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
     theme: {
