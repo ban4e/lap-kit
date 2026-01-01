@@ -3,6 +3,8 @@
   "dependencies": {
     "external": [
       "@floating-ui/react",
+      "classnames",
+      "tailwind-merge",
       "vanilla-calendar-pro"
     ],
     "registry": [
@@ -11,8 +13,8 @@
       "Tooltip"
     ],
     "shared": [
-      "@/shared/lib/types",
-      "@/shared/lib/utils"
+      "src/shared/lib/types/valueOf.ts",
+      "src/shared/lib/utils/classes.ts"
     ]
   },
   "files": [

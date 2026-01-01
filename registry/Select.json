@@ -2,14 +2,16 @@
   "name": "Select",
   "dependencies": {
     "external": [
-      "classnames"
+      "classnames",
+      "tailwind-merge"
     ],
     "registry": [
       "FieldContainer"
     ],
     "shared": [
-      "@/shared/lib/hooks/useCombinedRefs",
-      "@/shared/lib/hooks/useRect"
+      "src/shared/lib/hooks/useCombinedRefs.ts",
+      "src/shared/lib/hooks/useRect.ts",
+      "src/shared/lib/utils/classes.ts"
     ]
   },
   "files": [

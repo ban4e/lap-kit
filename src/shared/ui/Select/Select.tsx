@@ -1,5 +1,4 @@
 // TODO: Add multiselect checkboxes to option; Remove focus after multiselect is cleared by clicking button
-import cn from 'classnames';
 import { Children, isValidElement, JSX, memo, Ref, useCallback, useMemo, useRef, useState } from 'react';
 import ReactSelect, {
     ActionMeta,
@@ -18,6 +17,7 @@ import ReactSelect, {
 
 import { useCombinedRefs } from '@/shared/lib/hooks/useCombinedRefs';
 import { useRect } from '@/shared/lib/hooks/useRect';
+import { cn, type Argument } from '@/shared/lib/utils/classes';
 import { FieldContainer, VIEWS_WITH_CLOSE_LABEL } from '@/shared/ui/FieldContainer';
 
 import styles from './Select.module.css';
@@ -43,7 +43,7 @@ type TSelectProps<
         isMulti?: IsMulti;
         onChange?: TSelectOnChange<Option, IsMulti, ValueKey>;
         /** Additional className for options. This can be useful when the portal is used and some styles are inherited from another parent element. */
-        optionClassName?: cn.Argument;
+        optionClassName?: Argument;
     };
 type TSelectOnChange<
     Option extends object = OptionType,

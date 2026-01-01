@@ -3,14 +3,16 @@
   "dependencies": {
     "external": [
       "class-variance-authority",
-      "react-transition-group"
+      "classnames",
+      "react-transition-group",
+      "tailwind-merge"
     ],
     "registry": [],
     "shared": [
-      "@/shared/lib/hooks/usePulse",
-      "@/shared/lib/hooks/useRect",
-      "@/shared/lib/types",
-      "@/shared/lib/utils"
+      "src/shared/lib/hooks/usePulse.ts",
+      "src/shared/lib/hooks/useRect.ts",
+      "src/shared/lib/types/valueOf.ts",
+      "src/shared/lib/utils/classes.ts"
     ]
   },
   "files": [

@@ -3,10 +3,13 @@
   "dependencies": {
     "external": [
       "classnames",
-      "nouislider"
+      "nouislider",
+      "tailwind-merge"
     ],
     "registry": [],
-    "shared": []
+    "shared": [
+      "src/shared/lib/utils/classes.ts"
+    ]
   },
   "files": [
     "src/shared/ui/RangeSlider/RangeSlider.css",

@@ -2,8 +2,8 @@ import { UseFloatingOptions } from '@floating-ui/react';
 import { useRef, useState, useCallback, useEffect } from 'react';
 import { Calendar, DatesArr, type Options } from 'vanilla-calendar-pro';
 
-import { ValueOf } from '@/shared/lib/types';
-import { cn } from '@/shared/lib/utils';
+import { ValueOf } from '@/shared/lib/types/valueOf';
+import { cn } from '@/shared/lib/utils/classes';
 import { FieldContainer } from '@/shared/ui/FieldContainer';
 import { InputAtomic } from '@/shared/ui/Input';
 import { Tooltip } from '@/shared/ui/Tooltip';

@@ -23,8 +23,8 @@ import {
 } from '@floating-ui/react';
 import { cloneElement, createContext, isValidElement, use, useMemo, useRef, useState } from 'react';
 
-import { ValueOf } from '@/shared/lib/types';
-import { cn } from '@/shared/lib/utils';
+import { ValueOf } from '@/shared/lib/types/valueOf';
+import { cn } from '@/shared/lib/utils/classes';
 
 import styles from './Tooltip.module.css';
 

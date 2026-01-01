@@ -2,13 +2,15 @@
   "name": "FieldContainer",
   "dependencies": {
     "external": [
-      "class-variance-authority"
+      "class-variance-authority",
+      "classnames",
+      "tailwind-merge"
     ],
     "registry": [],
     "shared": [
-      "@/shared/lib/hooks/useRect",
-      "@/shared/lib/types",
-      "@/shared/lib/utils"
+      "src/shared/lib/hooks/useRect.ts",
+      "src/shared/lib/types/valueOf.ts",
+      "src/shared/lib/utils/classes.ts"
     ]
   },
   "files": [

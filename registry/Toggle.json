@@ -2,10 +2,13 @@
   "name": "Toggle",
   "dependencies": {
     "external": [
-      "classnames"
+      "classnames",
+      "tailwind-merge"
     ],
     "registry": [],
-    "shared": []
+    "shared": [
+      "src/shared/lib/utils/classes.ts"
+    ]
   },
   "files": [
     "src/shared/ui/Toggle/Toggle.module.css",

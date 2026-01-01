@@ -4,8 +4,8 @@ import { CSSTransition, TransitionGroup } from 'react-transition-group';
 
 import { usePulse } from '@/shared/lib/hooks/usePulse';
 import { useRect } from '@/shared/lib/hooks/useRect';
-import { ValueOf } from '@/shared/lib/types';
-import { cn } from '@/shared/lib/utils';
+import { ValueOf } from '@/shared/lib/types/valueOf';
+import { cn } from '@/shared/lib/utils/classes';
 
 import styles from './Button.module.css';
 

@@ -1,11 +1,14 @@
 {
   "name": "Tooltip",
   "dependencies": {
-    "external": [],
+    "external": [
+      "classnames",
+      "tailwind-merge"
+    ],
     "registry": [],
     "shared": [
-      "@/shared/lib/types",
-      "@/shared/lib/utils"
+      "src/shared/lib/types/valueOf.ts",
+      "src/shared/lib/utils/classes.ts"
     ]
   },
   "files": [

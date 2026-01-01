@@ -14,7 +14,7 @@
         "coverage": "vitest run --coverage",
         "check-types": "tsc --noEmit",
         "generate-registry": "npx tsx registry/autoGenerate.ts",
-        "generate-all-registries": "npx tsx registry/autoGenerate.ts --all"
+        "generate-registry-all": "npx tsx registry/autoGenerate.ts --all"
     },
     "dependencies": {
         "@floating-ui/react": "^0.27.4",

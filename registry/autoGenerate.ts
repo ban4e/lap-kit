@@ -11,47 +11,93 @@ const __rootDir = path.join(__dirname, '..');
 
 /** Analyze component source code and extract dependencies */
 function analyzeComponent(componentName: string) {
-    const componentDir = path.join(__rootDir, UI_COMPONENTS_PATH, componentName);
+    try {
+        const componentDir = path.join(__rootDir, UI_COMPONENTS_PATH, componentName);
 
-    if (!fs.existsSync(componentDir)) {
-        throw new Error(`Component directory not found: ${componentDir}`);
-    }
-
-    // Find all files in component directory
-    const files = findRegistryFiles({ dir: componentDir });
-    const dependencies = {
-        external: new Set(),
-        registry: new Set(),
-        shared: new Set()
-    };
-
-    for (const file of files) {
-        if (file.endsWith('.tsx') || file.endsWith('.ts')) {
-            const content = fs.readFileSync(file, 'utf-8');
-            const deps = parseDependencies(content);
-
-            deps.forEach((dep) => {
-                if (isExternalPackage(dep)) {
-                    !PEER_DEPS.includes(dep) && dependencies.external.add(dep);
-                } else if (isSharedUtility(dep)) {
-                    dependencies.shared.add(dep);
-                } else if (isRegistryComponent(dep)) {
-                    // i.e. @/shared/ui/FieldContainer => FieldContainer
-                    dependencies.registry.add(dep.replace('@/shared/ui/', ''));
-                }
-            });
+        if (!fs.existsSync(componentDir)) {
+            throw new Error(`Component directory not found: ${componentDir}`);
         }
+
+        // Find all files in component directory
+        const files = findRegistryFiles({ dir: componentDir });
+        const dependencies = {
+            external: new Set(),
+            registry: new Set(),
+            shared: new Set()
+        };
+
+        for (const file of files) {
+            const fileDeps = findFileDeps(file);
+            dependencies.external = new Set([...dependencies.external, ...fileDeps.external]);
+            dependencies.registry = new Set([...dependencies.registry, ...fileDeps.registry]);
+            dependencies.shared = new Set([...dependencies.shared, ...fileDeps.shared]);
+        }
+
+        return {
+            name: componentName,
+            dependencies: {
+                external: Array.from(dependencies.external).sort(),
+                registry: Array.from(dependencies.registry).sort(),
+                shared: Array.from(dependencies.shared).sort()
+            },
+            files
+        };
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error(`❌ Failed to analyze component ${componentName}:`, error.message);
+        } else {
+            console.error(`❌ Failed to analyze component ${componentName}:`, String(error));
+        }
+
+        process.exit(1);
+    }
+}
+
+const analysisCache = new Map<string, { external: Set<string>; shared: Set<string> }>();
+function findFileDeps(file: string): { external: Set<string>; registry: Set<string>; shared: Set<string> } {
+    // Check cache first
+    if (analysisCache.has(file)) {
+        return {
+            external: new Set(analysisCache.get(file)!.external),
+            registry: new Set(),
+            shared: new Set(analysisCache.get(file)!.shared)
+        };
     }
 
-    return {
-        name: componentName,
-        dependencies: {
-            external: Array.from(dependencies.external).sort(),
-            registry: Array.from(dependencies.registry).sort(),
-            shared: Array.from(dependencies.shared).sort()
-        },
-        files
+    const dependencies = {
+        external: new Set<string>(),
+        registry: new Set<string>(),
+        shared: new Set<string>()
     };
+
+    if (file.endsWith('.tsx') || file.endsWith('.ts')) {
+        const content = fs.readFileSync(file, 'utf-8');
+        const deps = parseDependencies(content);
+
+        deps.forEach((dep) => {
+            if (isExternalPackage(dep)) {
+                !PEER_DEPS.includes(dep) && dependencies.external.add(dep);
+            } else if (isSharedUtility(dep)) {
+                const resolvedPath = resolveAliasPath(dep);
+                dependencies.shared.add(resolvedPath);
+
+                // Recursively analyze shared deps, but they'll be cached
+                const sharedDeps = findFileDeps(resolvedPath);
+                dependencies.external = new Set([...dependencies.external, ...sharedDeps.external]);
+                dependencies.shared = new Set([...dependencies.shared, ...sharedDeps.shared]);
+            } else if (isRegistryComponent(dep)) {
+                dependencies.registry.add(dep.replace('@/shared/ui/', ''));
+            }
+        });
+    }
+
+    // Cache the result (only external and shared, since registry is component-specific)
+    analysisCache.set(file, {
+        external: new Set(dependencies.external),
+        shared: new Set(dependencies.shared)
+    });
+
+    return dependencies;
 }
 
 /** Find all files inside registry dir */
@@ -88,6 +134,63 @@ function parseDependencies(content: string) {
     }
 
     return deps;
+}
+
+/** Check if a path already has a file extension */
+function hasFileExtension(filePath: string): boolean {
+    return /\.(ts|tsx|js|jsx|mjs|cjs)$/.test(filePath);
+}
+
+function getViteAliases(): Record<string, string> {
+    const viteConfigPath = path.join(__rootDir, 'vite.config.ts');
+    const viteConfigContent = fs.readFileSync(viteConfigPath, 'utf-8');
+
+    const aliases: Record<string, string> = {};
+
+    // Match alias definitions: { find: '@', replacement: path.resolve(__dirname, 'src') }
+    const aliasRegex = /{ find: ['"]([^'"]+)['"], replacement: path\.resolve\(__dirname, ['"]([^'"]+)['"]\) }/g;
+
+    let match;
+    while ((match = aliasRegex.exec(viteConfigContent)) !== null) {
+        const alias = match[1]; // e.g., '@'
+        const replacement = match[2]; // e.g., 'src'
+        aliases[alias] = replacement;
+    }
+
+    return aliases;
+}
+
+/** Resolve alias paths to actual file paths using Vite config */
+function resolveAliasPath(importPath: string): string {
+    const aliases = getViteAliases();
+
+    // Check if path starts with an alias
+    for (const [alias, replacement] of Object.entries(aliases)) {
+        if (importPath.startsWith(alias)) {
+            // Replace alias with replacement
+            const resolved = importPath.replace(alias, replacement);
+
+            // If import already has extension, use it as-is
+            if (hasFileExtension(resolved)) {
+                return resolved;
+            }
+
+            // Try different extensions in priority order
+            const extensions = ['.ts', '.tsx', '.js', '.jsx'];
+            const fullPath = path.join(__rootDir, resolved);
+
+            for (const ext of extensions) {
+                if (fs.existsSync(fullPath + ext)) {
+                    return resolved + ext;
+                }
+            }
+
+            throw new Error(`File not found: ${fullPath}`);
+        }
+    }
+
+    // Return as-is if no alias found
+    return importPath;
 }
 
 /** Determine if import is from npm package */

@@ -9,7 +9,7 @@
       "FieldContainer"
     ],
     "shared": [
-      "@/shared/lib/hooks/useCombinedRefs"
+      "src/shared/lib/hooks/useCombinedRefs.ts"
     ]
   },
   "files": [

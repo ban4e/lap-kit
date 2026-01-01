@@ -1,5 +1,6 @@
-import cn from 'classnames';
 import { useId, ComponentPropsWithRef, forwardRef } from 'react';
+
+import { cn } from '@/shared/lib/utils/classes';
 
 import styles from './Toggle.module.css';
 

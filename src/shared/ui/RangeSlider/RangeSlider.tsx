@@ -1,6 +1,7 @@
-import cn from 'classnames';
 import { create, API as TSliderBase, target as TargetElement, Options as SliderOptions, PipsMode } from 'nouislider';
 import { memo, useEffect, useRef } from 'react';
+
+import { cn, type Argument } from '@/shared/lib/utils/classes';
 import './RangeSlider.css'; // TODO: change default classes to custom classes
 
 // PipsMode is an enum, so using it in props requires importing the enum. Below types allow setting mode as a string:
@@ -17,7 +18,7 @@ type CustomPips =
     >;
 type TProps = Omit<SliderOptions, 'start' | 'pips'> &
     Required<Pick<SliderOptions, 'start'>> & {
-        className?: cn.Argument;
+        className?: Argument;
         disabled?: boolean;
         onChange?: Parameters<TSliderBase['on']>[1];
         pips?: CustomPips;
