@@ -43,7 +43,7 @@ export const InputAtomic = forwardRef<HTMLInputElement, InputAtomicProps>(functi
             }
         }
 
-        inputRef.current && IMask(inputRef.current as HTMLInputElement, maskOptions); // type guard not working, that's why use type assertion
+        inputRef.current && IMask(inputRef.current, maskOptions); // type guard not working, that's why use type assertion
     }, [inputRef, mask]);
 
     return <input ref={combinedRef} className={cn(className)} type={type} {...props} />;

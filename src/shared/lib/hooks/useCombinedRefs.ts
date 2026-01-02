@@ -31,7 +31,5 @@ export function useCombinedRefs<T>(...refs: OptionalRef<T>[]) {
         }
 
         previousRefs.current = refs;
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, refs);
 }

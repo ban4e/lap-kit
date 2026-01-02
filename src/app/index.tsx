@@ -40,8 +40,14 @@ export const App = () => {
                 <Input label="Your label here" view="filled" />
                 <Input label="Your title here" prefix="kg" view="clear" />
                 <Select isClearable isSearchable label="Your label here" options={options} suffix="kg" />
-                <Select label="Your label here" options={options} suffix="kg" view="filled" menuPortalTarget={null} />
-                <Select isMulti={true} label="Your label here" options={options} view="filled" menuPortalTarget={null} />
+                <Select label="Your label here" menuPortalTarget={null} options={options} suffix="kg" view="filled" />
+                <Select
+                    isMulti={true}
+                    label="Your label here"
+                    menuPortalTarget={null}
+                    options={options}
+                    view="filled"
+                />
                 <RangeSlider
                     connect="lower"
                     pips={pips}

@@ -179,10 +179,14 @@ export const DatePicker = <IsRange extends boolean = false>({
     useEffect(() => {
         if (format && format !== DEFAULT_FORMAT) {
             // TODO: should inputValue be updated here?
-            (async () => {
-                await loadDayjs();
-                shadowValue.current = inputValue.map((date) => separateDateAndTime({ value: date, withTime }));
-            })();
+            try {
+                void (async () => {
+                    await loadDayjs();
+                    shadowValue.current = inputValue.map((date) => separateDateAndTime({ value: date, withTime }));
+                })();
+            } catch (err) {
+                console.error('Dayjs initialization failed for Datepicker:', err);
+            }
         }
     }, [format, withTime]);
 

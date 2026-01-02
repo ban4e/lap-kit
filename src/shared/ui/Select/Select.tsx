@@ -1,5 +1,5 @@
 // TODO: Add multiselect checkboxes to option; Remove focus after multiselect is cleared by clicking button
-import { Children, isValidElement, JSX, memo, Ref, useCallback, useMemo, useRef, useState } from 'react';
+import { ReactNode, Children, isValidElement, JSX, memo, Ref, useCallback, useMemo, useRef, useState } from 'react';
 import ReactSelect, {
     ActionMeta,
     ControlProps,
@@ -21,6 +21,19 @@ import { cn, type Argument } from '@/shared/lib/utils/classes';
 import { FieldContainer, VIEWS_WITH_CLOSE_LABEL } from '@/shared/ui/FieldContainer';
 
 import styles from './Select.module.css';
+
+const reactNodeToString = (node: ReactNode): string => {
+    if (!node) return '';
+    if (typeof node === 'string') return node;
+    if (typeof node === 'number' || typeof node === 'boolean') return String(node);
+    if (Array.isArray(node)) {
+        return node.map(reactNodeToString).join('');
+    }
+
+    // For React elements, we can't easily extract text in React runtime
+    // You might need a different approach
+    return '';
+};
 
 type OptionType = { label: React.ReactNode; value: number | string };
 type TSelectReturnValue<T> = T | number | string | null;
@@ -52,11 +65,11 @@ type TSelectOnChange<
 > = (
     newValue: IsMulti extends true
         ? ValueKey extends string
-        ? TSelectReturnValue<Option>[]
-        : Option[]
+            ? TSelectReturnValue<Option>[]
+            : Option[]
         : ValueKey extends string
-        ? TSelectReturnValue<Option>
-        : Option | null,
+          ? TSelectReturnValue<Option>
+          : Option | null,
     actionMeta: ActionMeta<Option>
 ) => void;
 
@@ -99,7 +112,9 @@ const ValueContainerComponent = <
                         selectValue: selectedValues // Provide the current selected values
                     };
 
-                    return formatOptionLabel(option, meta);
+                    const result = formatOptionLabel(option, meta);
+
+                    return typeof result === 'string' ? result : reactNodeToString(result);
                 }
 
                 // Fall back to `getOptionLabel` or the default label
@@ -266,17 +281,17 @@ const Select = memo(function Select<
         if (typeof onChange === 'function') {
             checkOptionIsMulti(option) && isMulti
                 ? onChange(
-                    option.map((item: Option) =>
-                        valueKey && valueKey in item ? item[valueKey as keyof Option] : (item as Option)
-                    ) as TOnChangeNewValue,
-                    meta
-                )
+                      option.map((item: Option) =>
+                          valueKey && valueKey in item ? item[valueKey as keyof Option] : item
+                      ) as TOnChangeNewValue,
+                      meta
+                  )
                 : onChange(
-                    (valueKey && option && valueKey in option
-                        ? ((option as Option)?.[valueKey as keyof Option] ?? null)
-                        : option) as TOnChangeNewValue,
-                    meta
-                );
+                      (valueKey && option && valueKey in option
+                          ? ((option as Option)?.[valueKey as keyof Option] ?? null)
+                          : option) as TOnChangeNewValue,
+                      meta
+                  );
         }
     };
 

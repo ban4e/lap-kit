@@ -39,7 +39,7 @@ export const Default: StoryObj<typeof Select> = {
             control: 'text'
         },
         menuPortalTarget: {
-            description: 'Use `null` to prevent from portaling. Default is `document.body`.',
+            description: 'Use `null` to prevent from portaling. Default is `document.body`.'
         },
         prefix: {
             control: 'text'
@@ -71,7 +71,10 @@ export const Default: StoryObj<typeof Select> = {
         isMulti: false
     },
     parameters: {
-        controls: { include: ['suffix', 'prefix', 'disabled', 'isMulti', 'error', 'label', 'view', 'menuPortalTarget'], expanded: true }
+        controls: {
+            include: ['suffix', 'prefix', 'disabled', 'isMulti', 'error', 'label', 'view', 'menuPortalTarget'],
+            expanded: true
+        }
     },
     render: (args) => (
         <div

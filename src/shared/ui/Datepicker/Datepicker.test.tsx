@@ -31,7 +31,7 @@ describe('Datepicker component', () => {
         expect(input.value).toBe(today);
     });
 
-    test('Focuses next input by pressing enter for range DatePicker', async () => {
+    test('Focuses next input by pressing enter for range DatePicker', () => {
         // Arrange
         const { container } = render(<DatePicker isRange />);
         const inputFirst = container.querySelector('[data-input-index="0"]') as HTMLInputElement;
@@ -45,7 +45,7 @@ describe('Datepicker component', () => {
         expect(inputSecond).toHaveFocus();
     });
 
-    test('DatePicker clears value by clicking clear button', async () => {
+    test('DatePicker clears value by clicking clear button', () => {
         // Arrange
         const onChange = vi.fn();
         const { container, getByLabelText } = render(

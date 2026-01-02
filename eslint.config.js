@@ -35,17 +35,20 @@ export default tseslint.config(
             'no-undef': 2 // This rule is enabled for JavaScript files to catch references to undefined variables.
         }
     },
+
+    // ========== COMMON RULES ==========
     {
-        files: ['**/*.{cjs}'],
+        files: ['**/*.{js,jsx,cjs,mjs,ts,tsx}'],
         extends: [
             eslint.configs.recommended,
             eslintPluginImportX.flatConfigs.recommended,
+            eslintPluginImportX.flatConfigs.typescript,
             eslintPluginPrettierRecommended,
             eslintConfigPrettier
         ],
         rules: {
             // Code style
-            indent: [2, 4, { SwitchCase: 1, offsetTernaryExpressions: true }],
+            // indent: 0, // [2, 4, { SwitchCase: 1, offsetTernaryExpressions: true }],
             'comma-dangle': [2, 'never'],
             'padding-line-between-statements': [2, { blankLine: 'always', prev: '*', next: 'return' }],
             'consistent-return': 0,
@@ -109,25 +112,21 @@ export default tseslint.config(
             'import-x/prefer-default-export': 0
         }
     },
+
+    // ========== TS RULES ==========
     {
-        files: ['**/*.{js,jsx,mjs,ts,tsx}'],
+        files: ['**/*.{ts,tsx}'],
         extends: [
-            eslint.configs.recommended,
-            ...tsConfigs.recommended,
-            reactPlugin.configs.flat.recommended,
-            reactPlugin.configs.flat['jsx-runtime'],
-            reactRefresh.configs.vite,
-            jsxA11y.flatConfigs.recommended,
-            eslintPluginImportX.flatConfigs.recommended,
-            eslintPluginImportX.flatConfigs.typescript,
-            eslintPluginPrettierRecommended,
-            eslintConfigPrettier
+            tsConfigs.recommendedTypeChecked,
+            {
+                languageOptions: {
+                    parserOptions: {
+                        projectService: true
+                    }
+                }
+            }
         ],
         settings: {
-            react: {
-                version: 'detect',
-                jsxRuntime: 'automatic' // Use "automatic" for the new JSX transform
-            },
             'import/resolver-next': [
                 createTypeScriptImportResolver({
                     alwaysTryTypes: true,
@@ -135,18 +134,17 @@ export default tseslint.config(
                 })
             ]
         },
-        plugins: {
-            react: reactPlugin,
-            'react-hooks': reactHooks
-        },
         languageOptions: {
-            // ...reactPlugin.configs.flat.recommended.languageOptions,
-            // ...jsxA11y.flatConfigs.recommended.languageOptions,
             parserOptions: {
+                // project: 'tsconfig.json',
                 parser: tsParser,
                 ecmaVersion: 'latest',
                 sourceType: 'module',
-                // projectService: true,
+                projectService: true,
+                // projectService: {
+                //     allowDefaultProject: ['eslint.config.js', 'vitest.config.ts', 'vite.config.ts'],
+                //     defaultProject: 'tsconfig.json'
+                // },
                 // tsconfigRootDir: import.meta.dirname,
                 ecmaFeatures: {
                     jsx: true
@@ -160,34 +158,8 @@ export default tseslint.config(
             }
         },
         rules: {
-            // Code style
-            indent: [2, 4, { SwitchCase: 1, offsetTernaryExpressions: true }],
-            'comma-dangle': [2, 'never'],
-            'padding-line-between-statements': [2, { blankLine: 'always', prev: '*', next: 'return' }],
-            'consistent-return': 0,
-            'no-undef': 0, // This rule is disabled for TypeScript files because TS type checker already ensures that variables are declared and defined.
-            'no-unused-expressions': [
-                2,
-                {
-                    allowTernary: true,
-                    allowShortCircuit: true
-                }
-            ],
-            'no-console': [2, { allow: ['warn', 'error', 'info'] }],
-            'no-plusplus': 0,
-            'no-param-reassign': [2, { props: false }],
-            'no-restricted-syntax': 0,
-            'no-nested-ternary': 0,
-            'max-classes-per-file': 0,
-            eqeqeq: 2,
-            'prefer-arrow-callback': [2, { allowNamedFunctions: true }],
-            'jsx-a11y/label-has-associated-control': [
-                2,
-                {
-                    assert: 'either',
-                    depth: 3
-                }
-            ],
+            indent: 0,
+            // TS code style
             '@typescript-eslint/no-unused-expressions': [
                 2,
                 {
@@ -201,50 +173,38 @@ export default tseslint.config(
                 {
                     functions: false
                 }
-            ],
+            ]
+        }
+    },
 
-            // Imports
-            'import-x/no-cycle': 2,
-            'import-x/no-unresolved': 2,
-            'import-x/extensions': [
+    // ========== REACT RULES ==========
+    {
+        files: ['**/*.{jsx,tsx}'],
+        extends: [
+            reactPlugin.configs.flat.recommended,
+            reactPlugin.configs.flat['jsx-runtime'],
+            reactRefresh.configs.vite,
+            jsxA11y.flatConfigs.recommended
+        ],
+        settings: {
+            react: {
+                version: 'detect',
+                jsxRuntime: 'automatic' // Use "automatic" for the new JSX transform
+            }
+        },
+        plugins: {
+            react: reactPlugin,
+            'react-hooks': reactHooks
+        },
+        rules: {
+            indent: 0,
+            'jsx-a11y/label-has-associated-control': [
                 2,
-                'ignorePackages',
                 {
-                    '': 'never', // this isn't the best solution, because it doesn't require extensions at all
-                    js: 'never',
-                    jsx: 'never',
-                    ts: 'never',
-                    tsx: 'never',
-                    'd.ts': 'always'
+                    assert: 'either',
+                    depth: 3
                 }
             ],
-            'import-x/no-extraneous-dependencies': [2, { devDependencies: true }],
-            'import-x/order': [
-                2,
-                {
-                    groups: ['builtin', 'external', 'internal', ['sibling', 'parent'], 'object', 'type'],
-                    pathGroups: [
-                        {
-                            pattern: '@/**',
-                            group: 'internal',
-                            position: 'before'
-                        },
-                        {
-                            pattern: '@components/**',
-                            group: 'internal',
-                            position: 'before'
-                        }
-                    ],
-                    pathGroupsExcludedImportTypes: ['builtin', 'object'],
-                    'newlines-between': 'always',
-                    alphabetize: {
-                        order: 'asc' /* sort in ascending order */,
-                        caseInsensitive: false /* ignore case */
-                    }
-                }
-            ],
-            'import-x/prefer-default-export': 0,
-
             // React
             ...reactHooks.configs.recommended.rules,
             'react/jsx-uses-react': 0,

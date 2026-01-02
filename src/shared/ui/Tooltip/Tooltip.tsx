@@ -59,7 +59,7 @@ type TooltipOptions = {
     withArrow?: boolean;
 };
 type TriggerOptions = React.HTMLProps<HTMLElement> & {
-    children?: React.ReactNode | never;
+    children?: React.ReactNode;
     ref?: React.Ref<HTMLElement | null>;
     asChild?: boolean;
 };

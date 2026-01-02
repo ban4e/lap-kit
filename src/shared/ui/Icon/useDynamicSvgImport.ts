@@ -1,7 +1,13 @@
 import React, { ReactElement, useEffect, useState } from 'react';
 
-export async function importIcon(name: string): Promise<React.FC<React.SVGProps<SVGElement>>> {
-    return (await import(`@assets/icons/${name}.svg`)).default;
+type IconComponent = {
+    default: React.FC<React.SVGProps<SVGElement>>;
+};
+
+export async function importIcon(name: string): Promise<IconComponent['default']> {
+    const icon = (await import(`@assets/icons/${name}.svg`)) as IconComponent;
+
+    return icon.default;
 }
 
 export function useDynamicSvgImport(iconName: string) {
@@ -32,7 +38,7 @@ export function useDynamicSvgImport(iconName: string) {
             }
         };
 
-        importSvgIcon();
+        void importSvgIcon();
     }, [iconName]);
 
     return { error, iconInfo };
