@@ -221,7 +221,7 @@ function generateManifest({ components }: { components?: string[] } = {}) {
     }
 
     const manifest = {
-        resultComponents
+        components: resultComponents
     };
 
     const manifestPath = path.join(__dirname, 'manifest/index.json');

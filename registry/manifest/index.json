@@ -1,5 +1,5 @@
 {
-  "resultComponents": [
+  "components": [
     "Button",
     "Datepicker",
     "FieldContainer",
