@@ -208,10 +208,43 @@ function isRegistryComponent(importPath: string) {
     return importPath.startsWith('@/shared/ui/');
 }
 
+/** Generate manifest.json with all component names */
+function generateManifest({ components }: { components?: string[] } = {}) {
+    const componentsDir = path.join(__rootDir, UI_COMPONENTS_PATH);
+    let resultComponents = components;
+    if (!resultComponents) {
+        resultComponents = fs
+            .readdirSync(componentsDir, { withFileTypes: true })
+            .filter((dirent) => dirent.isDirectory())
+            .map((dirent) => dirent.name)
+            .sort();
+    }
+
+    const manifest = {
+        resultComponents
+    };
+
+    const manifestPath = path.join(__dirname, 'manifest/index.json');
+
+    // Create directory if it doesn't exist
+    const manifestDir = path.dirname(manifestPath);
+    fs.mkdirSync(manifestDir, { recursive: true });
+
+    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+
+    console.info(`✅ Generated manifest.json with ${resultComponents.length} components`);
+}
+
 /**
  * Generate registry for single component
  */
-function generateRegistry(componentName: string) {
+function generateRegistry({
+    componentName,
+    isGenerateManifest = true
+}: {
+    componentName: string;
+    isGenerateManifest?: boolean;
+}) {
     console.info(`Generating registry for ${componentName}...`);
 
     try {
@@ -220,6 +253,7 @@ function generateRegistry(componentName: string) {
 
         fs.writeFileSync(registryPath, JSON.stringify(registry, null, 2));
         console.info(`✅ Generated ${registryPath}`);
+        isGenerateManifest && generateManifest();
     } catch (error) {
         if (error instanceof Error) {
             console.error(`❌ Failed to generate registry for ${componentName}:`, error.message);
@@ -231,16 +265,24 @@ function generateRegistry(componentName: string) {
 
 /** Generate registries for all components */
 function generateAllRegistries() {
-    const componentsDir = path.join(__rootDir, UI_COMPONENTS_PATH);
-    const components = fs
-        .readdirSync(componentsDir, { withFileTypes: true })
-        .filter((dirent) => dirent.isDirectory())
-        .map((dirent) => dirent.name);
+    try {
+        const componentsDir = path.join(__rootDir, UI_COMPONENTS_PATH);
+        const components = fs
+            .readdirSync(componentsDir, { withFileTypes: true })
+            .filter((dirent) => dirent.isDirectory())
+            .map((dirent) => dirent.name);
 
-    console.info(`Found ${components.length} components: ${components.join(', ')}`);
+        for (const component of components) {
+            generateRegistry({ componentName: component, isGenerateManifest: false });
+        }
 
-    for (const component of components) {
-        generateRegistry(component);
+        generateManifest({ components });
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error(`❌ Failed to generate all registries:`, error.message);
+        } else {
+            console.error(`❌ Failed to generate all registries:`, String(error));
+        }
     }
 }
 
@@ -251,7 +293,7 @@ const command = args[0];
 if (command === '--all') {
     generateAllRegistries();
 } else if (command) {
-    generateRegistry(command);
+    generateRegistry({ componentName: command });
 } else {
     console.info('Usage:');
     console.info('  node registry/autoGenerate.ts button');

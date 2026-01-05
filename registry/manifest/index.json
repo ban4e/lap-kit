@@ -1,0 +1,13 @@
+{
+  "resultComponents": [
+    "Button",
+    "Datepicker",
+    "FieldContainer",
+    "Icon",
+    "Input",
+    "RangeSlider",
+    "Select",
+    "Toggle",
+    "Tooltip"
+  ]
+}
