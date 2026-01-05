@@ -18,7 +18,6 @@
   "files": [
     "src/shared/ui/Button/Button.module.css",
     "src/shared/ui/Button/Button.tsx",
-    "src/shared/ui/Button/Button.variants.tsx",
     "src/shared/ui/Button/index.tsx"
   ]
 }
