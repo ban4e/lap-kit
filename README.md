@@ -1,27 +1,56 @@
-# Heal Screen
+<p align="center">
+  <img src="./cli/src/assets/logo.png" alt="Logo" width="100" />
+  <br /><br />
+  <span style="font-size: 32px; font-weight: bold;">lap-kit</span>
+</p>
 
-Project is configurated to work with VS Code. See details in [VS Code settings](.vscode/settings.json)
+## About
 
-Use Github tags to find specific version.
+**lap-kit** is a React component library that allows you to install individual components directly into your project, instead of installing the entire library as a dependency.
 
-## Expanding the ESLint configuration
+---
+<br/><br/>
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
 
--   Configure the top-level `parserOptions` property like this:
+## Adding a New Component
 
-```js
-export default {
-    // other rules...
-    parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-        project: ['./tsconfig.json', './tsconfig.node.json'],
-        tsconfigRootDir: __dirname
-    }
-};
+### Step 1: Create all component files in `/src/shared/ui/<Component>`
+
+### Step 2: Run the command to create registry files
+
+```bash
+npm run generate-registry-all
 ```
 
--   Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
--   Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
--   Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+### Step 3: Publish changes on GitHub
+
+---
+<br/><br/>
+
+
+## Testing Components Installation Locally
+
+### Step 1: Create a Test Project
+
+```bash
+cd ~
+# or
+cd ~/Desktop
+
+mkdir test-lap-kit
+cd test-lap-kit
+```
+
+### Step 2: Test Init Command
+
+```bash
+npx tsx <absolute-path-to-project>/lap-kit/cli/src/index.ts init
+```
+
+### Step 3: Test Add Command
+
+```bash
+npx tsx <absolute-path-to-project>/lap-kit/cli/src/index.ts add button
+```
+
+> **Tip:** Replace `<absolute-path-to-project>` with the absolute path to project directory
