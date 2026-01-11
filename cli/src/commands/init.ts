@@ -106,7 +106,7 @@ export async function initCommand(options: { isLocal?: boolean } = {}): Promise<
         writeConfig(config);
         console.info(chalk.green(`\n✅ Created ${DEFAULT_CONFIG_FILE}`));
 
-        console.info(chalk.blue('\n💡 Tip: Now run `npx lap-kit add <component>` to install components\n'));
+        console.info(chalk.blue('\n💡 Tip: Now run `npx @ban4e/lap-kit add <component>` to install components\n'));
     } catch (error) {
         // Handle user interruption (Ctrl+C) or other errors
         if (error instanceof Error) {

@@ -54,3 +54,22 @@ npx tsx <absolute-path-to-project>/lap-kit/cli/src/index.ts add button
 ```
 
 > **Tip:** Replace `<absolute-path-to-project>` with the absolute path to project directory
+---
+<br/><br/>
+
+
+## Updating NPM Package (CLI)
+
+### Step 1: Make necessary changes in `/cli` folder
+
+### Step 2: Run the command to build CLI project:
+
+```bash
+cd /cli && npm run build
+```
+
+### Step 3: Publish changes on npm with the following command:
+
+```bash
+cd /cli && npm publish
+```
