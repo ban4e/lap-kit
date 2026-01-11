@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./cli/src/assets/logo.png" alt="Logo" width="100" />
+  <img src="./cli/logo.png" alt="Logo" width="100" />
   <br /><br />
   <span style="font-size: 32px; font-weight: bold;">lap-kit</span>
 </p>

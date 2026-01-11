@@ -13,7 +13,7 @@ import tseslint, { configs as tsConfigs, parser as tsParser } from 'typescript-e
 
 /** @type {import('eslint').Linter.Config} */
 export default tseslint.config(
-    { ignores: ['dist', '!.storybook'] },
+    { ignores: ['dist', 'cli/dist', '!.storybook'] },
     {
         files: ['**/*.stories.@(ts|tsx|js|jsx|mjs|cjs)'],
         extends: [storybook.configs['flat/recommended']]

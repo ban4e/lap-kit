@@ -1,15 +1,16 @@
 {
-    "name": "lap-kit",
+    "name": "@ban4e/lap-kit",
     "version": "0.0.1",
-    "main": "index.js",
+    "main": "dist/index.js",
     "bin": {
-        "lap-kit": "./dist/index.js"
+        "lap-kit": "dist/index.js"
+    },
+    "publishConfig": {
+        "access": "public"
     },
     "type": "module",
     "scripts": {
-        "build": "tsc",
-        "dev": "npx tsx src/index.ts",
-        "prepublishOnly": "npm run build"
+        "build": "tsc && tsc-alias"
     },
     "keywords": [],
     "author": "ban4e",
@@ -26,6 +27,7 @@
     "devDependencies": {
         "@types/inquirer": "^9.0.9",
         "@types/node": "^24.10.1",
+        "tsc-alias": "^1.8.16",
         "typescript": "^5.9.3"
     }
 }
