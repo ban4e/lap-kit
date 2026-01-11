@@ -1,7 +1,6 @@
 import '../src/app/assets/styles/index.css';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import { Description, Stories, Subtitle, Title } from '@storybook/blocks';
-import React from 'react';
 
 import type { Preview } from '@storybook/react';
 

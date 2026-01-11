@@ -54,8 +54,6 @@
         "src",
         "types",
         "registry",
-        "vite.config.ts",
-        "vitest.config.ts",
         ".storybook/*.ts",
         ".storybook/*.tsx",
     ],
