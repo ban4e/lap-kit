@@ -1,6 +1,6 @@
 {
     "name": "@ban4e/lap-kit",
-    "version": "0.0.1",
+    "version": "0.0.3",
     "main": "dist/index.js",
     "bin": {
         "lap-kit": "dist/index.js"
