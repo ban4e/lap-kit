@@ -9,6 +9,7 @@ export const configSchema = z.object({
         components: z.string(),
         lib: z.string()
     }),
-    installedComponents: z.array(z.string()).optional()
+    installedComponents: z.array(z.string()).optional(),
+    palette: z.record(z.string(), z.string()).optional()
 });
 export type Config = z.infer<typeof configSchema>;

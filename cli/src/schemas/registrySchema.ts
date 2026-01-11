@@ -18,6 +18,9 @@ export const registryManifestSchema = z.object({
     components: z.array(z.string())
 });
 
+export const paletteSchema = z.record(z.string(), z.string());
+
 export type RegistryItem = z.infer<typeof registryItemSchema>;
 export type RegistryManifest = z.infer<typeof registryManifestSchema>;
 export type Dependencies = z.infer<typeof dependenciesSchema>;
+export type Palette = z.infer<typeof paletteSchema>;

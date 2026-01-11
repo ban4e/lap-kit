@@ -1,44 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { fileURLToPath } from 'url';
 
+import { fetchRemoteFile, findProjectRoot, readLocalFile } from './files';
 import {
     registryItemSchema,
     registryManifestSchema,
     type RegistryItem,
     type RegistryManifest
 } from '../schemas/registrySchema';
-
-/** Find project root by looking for the registry directory */
-export function findProjectRoot(maxDepth = 10): string | null {
-    // Get the directory of this file
-    const currentFileUrl = import.meta.url;
-    const currentFilePath = fileURLToPath(currentFileUrl);
-    let currentDir = path.dirname(currentFilePath);
-    let depth = 0;
-
-    while (depth < maxDepth) {
-        // Check if registry directory exists in current directory
-        const registryPath = path.join(currentDir, 'registry');
-
-        if (fs.existsSync(registryPath) && fs.statSync(registryPath).isDirectory()) {
-            return currentDir;
-        }
-
-        // Move up one directory
-        const parentDir = path.dirname(currentDir);
-
-        // Stop if we've reached the filesystem root
-        if (parentDir === currentDir) {
-            break;
-        }
-
-        currentDir = parentDir;
-        depth++;
-    }
-
-    return null; // Registry directory not found
-}
 
 /** Get registry directory path from CLI package location */
 function getLocalRegistryDir(): string | null {
@@ -58,18 +27,10 @@ function getLocalRegistryDir(): string | null {
 
 /** Get registry components from public GitHub repository */
 async function getRemoteRegistryComponents(): Promise<RegistryManifest['components']> {
-    // Default to GitHub raw URL if no custom registry URL provided
-    const baseUrl = 'https://raw.githubusercontent.com/ban4e/lap-kit/main';
-    const manifestUrl = `${baseUrl}/registry/manifest/index.json`;
+    const manifestPath = '/registry/manifest/index.json';
 
     try {
-        const response = await fetch(manifestUrl);
-        if (!response.ok) {
-            console.warn(`Failed to fetch registry manifest: ${response.status}`);
-
-            return [];
-        }
-
+        const response = await fetchRemoteFile(manifestPath);
         const manifest = registryManifestSchema.parse(await response.json());
 
         return manifest.components || [];
@@ -114,14 +75,10 @@ function getLocalComponentRegistry(componentName: string): RegistryItem | null {
 
     const registryPath = path.join(registryDir, `${componentName}.json`);
 
-    if (!fs.existsSync(registryPath)) {
-        return null;
-    }
-
     try {
-        const content = fs.readFileSync(registryPath, 'utf-8');
+        const content = readLocalFile(registryPath);
 
-        return registryItemSchema.parse(JSON.parse(content));
+        return content ? registryItemSchema.parse(JSON.parse(content)) : null;
     } catch (error) {
         console.error(`Error reading local registry for ${componentName}:`, error);
 
@@ -130,15 +87,10 @@ function getLocalComponentRegistry(componentName: string): RegistryItem | null {
 }
 
 async function getRemoteComponentRegistry(componentName: string): Promise<RegistryItem | null> {
-    const registryFileUrl = `https://raw.githubusercontent.com/ban4e/lap-kit/main/registry/${componentName}.json`;
+    const registryFilePath = `/registry/${componentName}.json`;
 
     try {
-        const response = await fetch(registryFileUrl);
-        if (!response.ok) {
-            console.warn(`Failed to fetch registry component file: ${response.status}`);
-
-            return null;
-        }
+        const response = await fetchRemoteFile(registryFilePath);
 
         return registryItemSchema.parse(await response.json());
     } catch (error) {

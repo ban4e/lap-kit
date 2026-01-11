@@ -12,19 +12,25 @@ import {
     DEFAULT_LIB_ALIAS,
     DEFAULT_LIB_PATH
 } from '../utils/config';
+import { generateTailwindSetupInstructions } from '../utils/instructions';
+import { readPaletteFile, getTailwindInfo } from '../utils/palette';
 
-export async function initCommand(): Promise<void> {
+import type { Config } from '../schemas/configSchema';
+
+export async function initCommand(options: { isLocal?: boolean } = {}): Promise<void> {
+    const isLocal = options?.isLocal || false;
+
     try {
         console.info(chalk.blue('🐾 Initializing lap-kit...\n'));
 
-        // Check if components.json already exists
+        // Check if config file already exists
         const configPath = path.join(process.cwd(), DEFAULT_CONFIG_FILE);
         if (fs.existsSync(configPath)) {
             const { overwrite } = await inquirer.prompt<{ overwrite: boolean }>([
                 {
                     type: 'confirm',
                     name: 'overwrite',
-                    message: 'components.json already exists. Overwrite?',
+                    message: `${DEFAULT_CONFIG_FILE} already exists. Overwrite?`,
                     default: false
                 }
             ]);
@@ -70,8 +76,7 @@ export async function initCommand(): Promise<void> {
         ]);
 
         // Create config
-        const config = {
-            // TODO: add type Config
+        const config: Config = {
             aliases: {
                 components: paths.componentsAlias,
                 lib: paths.libAlias
@@ -83,19 +88,30 @@ export async function initCommand(): Promise<void> {
             installedComponents: []
         };
 
-        // Write config
-        writeConfig(config);
-        console.info(chalk.green('\n✅ Created components.json\n'));
+        // Detect Tailwind installation
+        const tailwindInfo = getTailwindInfo();
 
-        // Show instructions
-        // console.log(generatePathAliasInstructions(config));
+        // Handle Tailwind and palette setup
+        const palette = await readPaletteFile({ isLocal });
+
+        if (palette) {
+            config.palette = palette;
+        } else {
+            console.warn(chalk.yellow('⚠️ Could not load palette data\n'));
+        }
+
+        console.info(await generateTailwindSetupInstructions({ twInfo: tailwindInfo, isLocal }));
+
+        // Write config (with palette if added)
+        writeConfig(config);
+        console.info(chalk.green(`\n✅ Created ${DEFAULT_CONFIG_FILE}`));
 
         console.info(chalk.blue('\n💡 Tip: Now run `npx lap-kit add <component>` to install components\n'));
     } catch (error) {
         // Handle user interruption (Ctrl+C) or other errors
         if (error instanceof Error) {
             if (error.message.includes('User force closed') || error.name === 'ExitPromptError') {
-                console.info(chalk.yellow('\n⚠️  Cancelled by user'));
+                console.info(chalk.yellow('\n⚠️ Cancelled by user'));
                 process.exit(0);
             }
         }

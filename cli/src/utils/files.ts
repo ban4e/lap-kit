@@ -1,14 +1,45 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
 
 import { DEFAULT_LIB_PATH } from './config';
-import { findProjectRoot } from './registry';
 
 import type { Config } from '../schemas/configSchema';
 import type { RegistryItem } from '../schemas/registrySchema';
 
+/** Find project root by looking for the registry directory */
+export function findProjectRoot(maxDepth = 10): string | null {
+    // Get the directory of this file
+    const currentFileUrl = import.meta.url;
+    const currentFilePath = fileURLToPath(currentFileUrl);
+    let currentDir = path.dirname(currentFilePath);
+    let depth = 0;
+
+    while (depth < maxDepth) {
+        // Check if registry directory exists in current directory
+        const registryPath = path.join(currentDir, 'registry');
+
+        if (fs.existsSync(registryPath) && fs.statSync(registryPath).isDirectory()) {
+            return currentDir;
+        }
+
+        // Move up one directory
+        const parentDir = path.dirname(currentDir);
+
+        // Stop if we've reached the filesystem root
+        if (parentDir === currentDir) {
+            break;
+        }
+
+        currentDir = parentDir;
+        depth++;
+    }
+
+    return null; // Registry directory not found
+}
+
 /** Fetch a file from the remote GitHub repository  */
-async function fetchRemoteFile(filePath: string): Promise<string> {
+export async function fetchRemoteFile(filePath: string): Promise<Response> {
     const baseUrl = 'https://raw.githubusercontent.com/ban4e/lap-kit/main';
     const fileUrl = `${baseUrl}/${filePath}`;
 
@@ -19,10 +50,26 @@ async function fetchRemoteFile(filePath: string): Promise<string> {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
 
-        return await response.text();
+        return response;
     } catch (error) {
         // Re-throw with more context
         throw new Error(`Failed to fetch ${filePath}: ${error instanceof Error ? error.message : String(error)}`);
+    }
+}
+
+export function readLocalFile(filePath: string) {
+    if (!fs.existsSync(filePath)) {
+        console.warn(`⚠️ File ${filePath} not found locally`);
+
+        return null;
+    }
+
+    try {
+        return fs.readFileSync(filePath, 'utf-8');
+    } catch (error) {
+        console.error(`Error reading ${filePath} locally:`, error);
+
+        return null;
     }
 }
 
@@ -103,7 +150,8 @@ export async function copyComponentFiles({
             content = fs.readFileSync(sourcePath, 'utf-8');
         } else {
             try {
-                content = await fetchRemoteFile(file);
+                const response = await fetchRemoteFile(file);
+                content = await response.text();
             } catch (error) {
                 console.warn(`⚠️ Failed to fetch remote file ${file}:`, error);
                 continue;
@@ -182,7 +230,8 @@ export async function copySharedLibs({
             content = fs.readFileSync(sourcePath, 'utf-8');
         } else {
             try {
-                content = await fetchRemoteFile(filePath);
+                const response = await fetchRemoteFile(filePath);
+                content = await response.text();
             } catch (error) {
                 console.warn(`⚠️ Failed to fetch remote file ${filePath}:`, error);
                 continue;

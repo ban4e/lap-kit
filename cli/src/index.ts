@@ -9,7 +9,11 @@ const program = new Command();
 
 program.name('lap-kit').description('CLI for installing Lap Kit components').version('0.0.1');
 
-program.command('init').description('Initialize your project and create config file').action(initCommand);
+program
+    .command('init')
+    .description('Initialize your project and create config file')
+    .option('--isLocal', 'Use local registry instead of remote')
+    .action(initCommand);
 
 program
     .command('add')
